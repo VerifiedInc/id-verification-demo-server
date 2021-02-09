@@ -1,12 +1,50 @@
-# demo-issuer-server
+# feathers-mikro-orm-starter
 
-> Issuer server for the Acme family of demos
+> A starter app using [FeathersJS](https://feathersjs.com) and [MikroORM](https://mikro-orm.io) with some additional configuration set up
 
-## About
+## What the starter app includes
+### Feathers
+- REST and socket.io transports
+- Local and JWT authentication (not really configured)
+
+### MikroORM
+- postgres driver
+- cli
+- custom (ish) migration scripts
+- config file
+- `BaseEntity` abstract class with `uuid`, `createdAt`, and `updatedAt` properties
+
+### feathers-mikro-orm
+- our custom adatper to help feathers and mikroORM play nice together
+
+### Unum ID types
+- our shared types library, so you won't have to redefine the interface for a PresentationRequest again
+
+### ESLint
+- configured for TypeScript and [semistandard](https://github.com/standard/semistandard)
+
+### Jest
+- not a whole lot of custom config here, hopefully it _jest_ works
+
+### Logging
+- [Winston](https://github.com/winstonjs/winston) configured to log to papertrail via syslog
+
+### Environment config
+- dotenv
+- example `.env` file with a few variables defined for database access, logging, etc
+- `config.ts` file exporting all of our environment variables with correct types and default values
+
+### How to Use
+- clone this repository
+- create a new repo in our github organzation and update the origin remote to it (so you don't accidentally push changes to this starter repo) 
+- that's about it, really
+
+
+### About Feathers
 
 This project uses [Feathers](http://feathersjs.com). An open source web framework for building modern real-time applications.
 
-## Getting Started
+#### Getting Started
 
 Getting up and running is as easy as 1, 2, 3.
 
@@ -14,21 +52,21 @@ Getting up and running is as easy as 1, 2, 3.
 2. Install your dependencies
 
     ```
-    cd path/to/demo-issuer-server
-    npm install
+    cd path/to/featheres-mikro-orm-starter
+    yarn install
     ```
 
 3. Start your app
 
     ```
-    npm start
+    yarn start
     ```
 
-## Testing
+#### Testing
 
-Simply run `npm test` and all your tests in the `test/` directory will be run.
+Simply run `yarn test` and all your tests in the `test/` directory will be run.
 
-## Scaffolding
+#### Scaffolding
 
 Feathers has a powerful command line interface. Here are a few things it can do:
 
@@ -40,6 +78,6 @@ $ feathers generate hook                  # Generate a new Hook
 $ feathers help                           # Show all commands
 ```
 
-## Help
+#### Help
 
 For more information on all the things you can do with Feathers visit [docs.feathersjs.com](http://docs.feathersjs.com).
