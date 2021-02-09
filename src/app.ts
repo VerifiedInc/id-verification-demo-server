@@ -4,11 +4,10 @@ import compress from 'compression';
 import helmet from 'helmet';
 import cors from 'cors';
 
-import feathers from '@feathersjs/feathers';
+import feathers, { HookContext as FeathersHookContext } from '@feathersjs/feathers';
 import configuration from '@feathersjs/configuration';
 import express from '@feathersjs/express';
 import socketio from '@feathersjs/socketio';
-
 
 import { Application } from './declarations';
 import logger from './logger';
@@ -16,7 +15,7 @@ import middleware from './middleware';
 import services from './services';
 import appHooks from './app.hooks';
 import channels from './channels';
-import { HookContext as FeathersHookContext } from '@feathersjs/feathers';
+
 import authentication from './authentication';
 // Don't remove this comment. It's needed to format import lines nicely.
 

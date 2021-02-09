@@ -7,8 +7,8 @@
     "max": 50
   },
   "authentication": {
-    "entity": "user",
-    "service": "user",
+    "entity": null,
+    "service": null,
     "secret": "JYydubv+UmIUDpsg6aPRFsUcOKc=",
     "authStrategies": [
       "jwt",
