@@ -311,6 +311,15 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@feathersjs/adapter-commons@^4.5.7":
+  version "4.5.11"
+  resolved "https://registry.yarnpkg.com/@feathersjs/adapter-commons/-/adapter-commons-4.5.11.tgz#b7eaa9a9124591aa639f9080a7522fa60fb29915"
+  integrity sha512-qJ+P/6GLR3KfXhzgRkvl3p66YmaTxLO1js1Jzs+d5QnnUYx+jWSV7tzYVZoVjQSlF8ht/zh9N5qfh0RV9w1E+w==
+  dependencies:
+    "@feathersjs/commons" "^4.5.11"
+    "@feathersjs/errors" "^4.5.11"
+    "@feathersjs/feathers" "^4.5.11"
+
 "@feathersjs/authentication-local@^4.5.9":
   version "4.5.11"
   resolved "https://registry.yarnpkg.com/@feathersjs/authentication-local/-/authentication-local-4.5.11.tgz#5663451d1c381e5a993bda238a06659fb09cad5f"
@@ -367,7 +376,7 @@
     config "^3.3.3"
     debug "^4.3.1"
 
-"@feathersjs/errors@^4.5.11", "@feathersjs/errors@^4.5.9":
+"@feathersjs/errors@^4.5.10", "@feathersjs/errors@^4.5.11", "@feathersjs/errors@^4.5.9":
   version "4.5.11"
   resolved "https://registry.yarnpkg.com/@feathersjs/errors/-/errors-4.5.11.tgz#419b4dd9b557fe7a87978363175cbd5e06f8b3b9"
   integrity sha512-KzkUqmaV7/SGK6SM/ILXjMI/EHOGKQE4GgDHCsB4+mcIwb8IZboeHL6IkYjh6MvwjKNDyS728McZvcflDGn/fA==
@@ -387,7 +396,7 @@
     lodash "^4.17.20"
     uberproto "^2.0.6"
 
-"@feathersjs/feathers@^4.5.11", "@feathersjs/feathers@^4.5.9":
+"@feathersjs/feathers@^4.5.10", "@feathersjs/feathers@^4.5.11", "@feathersjs/feathers@^4.5.9":
   version "4.5.11"
   resolved "https://registry.yarnpkg.com/@feathersjs/feathers/-/feathers-4.5.11.tgz#98999fe3857896bd15a676d4660dd92fe22481c4"
   integrity sha512-13zorhzi9eOwAW+l3oT4K8+CGCljpd9yPkx1XOZZyG5J1RSENWpPhgJ5Oe+qWw6Iqk768UBYp3+W1hLCQa6t2g==
@@ -622,7 +631,7 @@
     yargonaut "1.1.4"
     yargs "15.4.1"
 
-"@mikro-orm/core@^4.4.2":
+"@mikro-orm/core@^4.3.0", "@mikro-orm/core@^4.4.2":
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/@mikro-orm/core/-/core-4.4.2.tgz#9191e2c0e24368a21cd4866f17ff0e3ac018af18"
   integrity sha512-aoX3Wglu3Ak6O4KAmXzv3mqX6i48m8OkL+T5HOdttDnOu4nBL2KprQCRj2DvMhhduKpVX0gKjQ7zieZHD4j6fQ==
@@ -2764,6 +2773,16 @@ fb-watchman@^2.0.0:
   integrity sha512-DkPJKQeY6kKwmuMretBhr7G6Vodr7bFwDYTXIkfG1gjvNpaxBTQV3PbXg6bR1c1UP4jPOX0jHUbbHANL9vRjVg==
   dependencies:
     bser "2.1.1"
+
+"feathers-mikro-orm@git+ssh://git@github.com/UnumID/feathers-mikro-orm.git#573638e1eca7fd4578268f2d76ab84bf1d03718c":
+  version "0.0.2"
+  resolved "git+ssh://git@github.com/UnumID/feathers-mikro-orm.git#573638e1eca7fd4578268f2d76ab84bf1d03718c"
+  dependencies:
+    "@feathersjs/adapter-commons" "^4.5.7"
+    "@feathersjs/errors" "^4.5.10"
+    "@feathersjs/feathers" "^4.5.10"
+    "@mikro-orm/core" "^4.3.0"
+    uuid "^8.3.0"
 
 fecha@^4.2.0:
   version "4.2.0"
