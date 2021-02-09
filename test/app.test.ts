@@ -2,26 +2,30 @@ import { Server } from 'http';
 import url from 'url';
 import axios from 'axios';
 
-import app from '../src/app';
-
-const port = app.get('port') || 8998;
-const getUrl = (pathname?: string): string => url.format({
-  hostname: app.get('host') || 'localhost',
-  protocol: 'http',
-  port,
-  pathname
-});
+import generateApp from '../src/app';
+import { Application } from '../src/declarations';
 
 describe('Feathers application tests (with jest)', () => {
   let server: Server;
+  let app: Application;
+  let port: number;
+  let getUrl: (pathName?: string) => string;
 
-  beforeAll(done => {
+  beforeAll(async () => {
+    app = await generateApp();
+    port = app.get('port') || 8998;
+    getUrl = (pathname?: string): string => url.format({
+      hostname: app.get('host') || 'localhost',
+      protocol: 'http',
+      port,
+      pathname
+    });
     server = app.listen(port);
-    server.once('listening', () => done());
+    await new Promise(resolve => server.once('listening', resolve));
   });
 
-  afterAll(done => {
-    server.close(done);
+  afterAll(async () => {
+    await new Promise(resolve => server.close(resolve));
   });
 
   it('starts and shows the index page', async () => {
