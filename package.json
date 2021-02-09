@@ -29,7 +29,11 @@
     "dev": "ts-node-dev --no-notify src/",
     "start": "yarn run compile && node lib/",
     "jest": "jest  --forceExit",
-    "compile": "shx rm -rf lib/ && tsc"
+    "compile": "shx rm -rf lib/ && tsc",
+    "migrate": "yarn migration:up",
+    "migration:create": "yarn mikro-orm migration:create",
+    "migration:up": "yarn mikro-orm migration:up",
+    "migration:down": "yarn mikro-orm migration:down"
   },
   "standard": {
     "env": [
