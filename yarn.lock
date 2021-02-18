@@ -631,7 +631,7 @@
     yargonaut "1.1.4"
     yargs "15.4.1"
 
-"@mikro-orm/core@^4.3.0", "@mikro-orm/core@^4.4.2":
+"@mikro-orm/core@^4.4.2":
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/@mikro-orm/core/-/core-4.4.2.tgz#9191e2c0e24368a21cd4866f17ff0e3ac018af18"
   integrity sha512-aoX3Wglu3Ak6O4KAmXzv3mqX6i48m8OkL+T5HOdttDnOu4nBL2KprQCRj2DvMhhduKpVX0gKjQ7zieZHD4j6fQ==
@@ -2778,14 +2778,14 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "2.1.1"
 
-"feathers-mikro-orm@git+ssh://git@github.com/UnumID/feathers-mikro-orm.git#573638e1eca7fd4578268f2d76ab84bf1d03718c":
+"feathers-mikro-orm@git+ssh://git@github.com/UnumID/feathers-mikro-orm.git#v0.2.1":
   version "0.0.2"
-  resolved "git+ssh://git@github.com/UnumID/feathers-mikro-orm.git#573638e1eca7fd4578268f2d76ab84bf1d03718c"
+  resolved "git+ssh://git@github.com/UnumID/feathers-mikro-orm.git#38d5dc831967b31dc13fad5ed49b122d449290e5"
   dependencies:
     "@feathersjs/adapter-commons" "^4.5.7"
     "@feathersjs/errors" "^4.5.10"
     "@feathersjs/feathers" "^4.5.10"
-    "@mikro-orm/core" "^4.3.0"
+    "@mikro-orm/core" "^4.4.2"
     uuid "^8.3.0"
 
 fecha@^4.2.0:
