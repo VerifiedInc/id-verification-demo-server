@@ -6,7 +6,6 @@ dotenv.config();
 
 interface Config {
   NODE_ENV: string;
-  PAPERTRAIL_PORT: number;
   LOG_LEVEL: string;
   DB_NAME: string;
   DB_HOST: string;
@@ -17,7 +16,6 @@ interface Config {
 
 const {
   NODE_ENV = 'development',
-  PAPERTRAIL_PORT = '',
   LOG_LEVEL = 'debug',
   DB_NAME = '',
   DB_HOST = 'localhost',
@@ -49,7 +47,6 @@ const dbConfig = isTestEnv(NODE_ENV)
 
 export const config: Config = {
   NODE_ENV,
-  PAPERTRAIL_PORT: parseInt(PAPERTRAIL_PORT, 10),
   LOG_LEVEL,
   ...dbConfig
 };

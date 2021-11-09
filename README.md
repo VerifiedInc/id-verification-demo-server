@@ -15,10 +15,10 @@
 - `BaseEntity` abstract class with `uuid`, `createdAt`, and `updatedAt` properties
 
 ### feathers-mikro-orm
-- our custom adatper to help feathers and mikroORM play nice together
+- our custom adapter to help feathers and mikroORM play nice together
 
 ### Unum ID types
-- our shared types library, so you won't have to redefine the interface for a PresentationRequest again
+- our shared types [library](https://github.com/UnumID/types), so you won't have to redefine the interface for a PresentationRequest again
 
 ### ESLint
 - configured for TypeScript and [semistandard](https://github.com/standard/semistandard)
@@ -27,7 +27,7 @@
 - not a whole lot of custom config here, hopefully it _jest_ works
 
 ### Logging
-- [Winston](https://github.com/winstonjs/winston) configured to log to papertrail via syslog
+- [Winston](https://github.com/winstonjs/winston) which logs to system out. When deployed, new relic infrastructure agent takes the logs from disk and exports to New Relic.
 
 ### Environment config
 - dotenv
@@ -38,7 +38,6 @@
 - clone this repository
 - create a new repo in our github organzation and update the origin remote to it (so you don't accidentally push changes to this starter repo) 
 - that's about it, really
-
 
 ### About Feathers
 
