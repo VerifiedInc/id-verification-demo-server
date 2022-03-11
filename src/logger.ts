@@ -40,3 +40,14 @@ const logger = createLogger({
 });
 
 export default logger;
+
+/**
+ * logs that a thrown error has been caught
+ * @param {string} caughtBy name of the method/function that caught the error
+ * @param {string} thrownBy name of the method/function that threw the error
+ * @param {unknown} error the thrown error
+ * @returns {void}
+ */
+export const logCaughtError = (caughtBy: string, thrownBy: string, error: unknown): void => {
+  logger.error(`${caughtBy} caught an error thrown by ${thrownBy}.`, error);
+};
