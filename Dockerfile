@@ -18,6 +18,6 @@ RUN --mount=type=ssh,id=github npm install
 
 COPY ./ /app/
 
-RUN npm compile
+RUN npm run compile
 
 CMD ["npm", "run", "start"]
