@@ -2,13 +2,14 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@0.1.22
-  aws-eks: circleci/aws-eks@0.2.3
+  aws-eks: circleci/aws-eks@2.1.1
   kubernetes: circleci/kubernetes@0.4.0
+  slack: circleci/slack@4.4.2 # ref: https://github.com/CircleCI-Public/slack-orb, https://circleci.com/developer/orbs/orb/circleci/slack#usage-examples
 
 jobs:
   test:
     docker:
-      - image: circleci/node:14.15.0
+      - image: cimg/node:14.15.0
         environment:
           TEST_DB_NAME: circle_test
           TEST_DB_PORT: '5432'
@@ -99,6 +100,8 @@ jobs:
           name: Update container image
 
   deploy-image:
+    docker: # Referencing the python image here, see https://github.com/CircleCI-Public/aws-eks-orb/issues/52#issuecomment-1006838213
+      - image: cimg/python:3.10
     parameters:
       cluster-name:
         type: string
@@ -108,7 +111,6 @@ jobs:
       deployment:
         type: string
 
-    executor: aws-eks/python3
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
@@ -116,11 +118,30 @@ jobs:
           aws-region: ${AWS_REGION}
           cluster-name: << parameters.cluster-name >>
       - run:
+          name: Deploy container image to dev
           command: |
             kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:"${CIRCLE_BRANCH}-${CIRCLE_PREVIOUS_BUILD_NUM}"
-          name: Update container image
+
+            # Check deployment rollout status every 10 seconds (max 10 minutes) until complete.
+            # ref: https://www.jeffgeerling.com/blog/2018/updating-kubernetes-deployment-and-waiting-it-roll-out-shell-script
+            ATTEMPTS=0
+            ROLLOUT_STATUS_CMD="kubectl rollout status deployment/<< parameters.deployment >>"
+            until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
+              $ROLLOUT_STATUS_CMD
+              ATTEMPTS=$((attempts + 1))
+              sleep 10
+            done
+      - slack/notify:
+          event: fail
+          mentions: '@devops-team'
+          template: basic_fail_1
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
 
   deploy-image-sandbox:
+    docker: # Referencing the python image here, see https://github.com/CircleCI-Public/aws-eks-orb/issues/52#issuecomment-1006838213
+      - image: cimg/python:3.10
     parameters:
       cluster-name:
         type: string
@@ -130,7 +151,6 @@ jobs:
       deployment:
         type: string
 
-    executor: aws-eks/python3
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
@@ -138,9 +158,19 @@ jobs:
           aws-region: ${AWS_REGION}
           cluster-name: << parameters.cluster-name >>
       - run:
+          name: Deploy container image to sandbox
           command: |
             kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:"${CIRCLE_TAG}"
-          name: Update container image
+
+            # Check deployment rollout status every 10 seconds (max 10 minutes) until complete.
+            # ref: https://www.jeffgeerling.com/blog/2018/updating-kubernetes-deployment-and-waiting-it-roll-out-shell-script
+            ATTEMPTS=0
+            ROLLOUT_STATUS_CMD="kubectl rollout status deployment/<< parameters.deployment >>"
+            until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
+              $ROLLOUT_STATUS_CMD
+              ATTEMPTS=$((attempts + 1))
+              sleep 10
+            done
 
 workflows:
   build-and-deploy-release:
