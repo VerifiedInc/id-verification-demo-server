@@ -24,7 +24,7 @@
     "yarn": ">= 0.18.0"
   },
   "scripts": {
-    "test": "npm run lint && npm run compile && npm run jest",
+    "test": "npm run lint && npm run compile && NODE_ENV=test npm run migrate && NODE_ENV=test npm run jest",
     "lint": "eslint src/. test/. --config .eslintrc.json --ext .ts --fix",
     "dev": "ts-node-dev --no-notify src/",
     "start": "npm run migrate && node lib/",
