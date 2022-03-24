@@ -7,6 +7,7 @@ import logger from './logger';
 import { pick } from 'lodash';
 import { iff } from 'feathers-hooks-common';
 import { isTest } from './services/hooks/isTest';
+import NodeCache from 'node-cache';
 
 /**
  * A LRU cache with an expiration of 60 seconds for use of storing transient new relic transaction ids.
