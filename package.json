@@ -61,7 +61,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "feathers-hooks-common": "^5.0.6",
-    "feathers-mikro-orm": "git+ssh://git@github.com/UnumID/feathers-mikro-orm.git#v0.3.1",
+    "feathers-mikro-orm": "git+ssh://git@github.com/UnumID/feathers-mikro-orm.git#v0.5.3",
     "helmet": "^4.2.0",
     "newrelic": "^8.9.1",
     "node-cache": "^5.1.2",
