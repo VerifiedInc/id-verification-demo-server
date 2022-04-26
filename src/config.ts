@@ -7,21 +7,25 @@ dotenv.config();
 interface Config {
   NODE_ENV: string;
   LOG_LEVEL: string;
+  ADMIN_AUTH_KEY: string;
   DB_NAME: string;
   DB_HOST: string;
   DB_PORT: number;
   DB_USER: string;
   DB_PASSWORD: string;
+  SAAS_CLIENT_URL: string;
 }
 
 const {
   NODE_ENV = 'development',
   LOG_LEVEL = 'debug',
+  ADMIN_AUTH_KEY = '',
   DB_NAME = '',
   DB_HOST = 'localhost',
   DB_PORT = '5432',
   DB_USER = '',
   DB_PASSWORD = '',
+  SAAS_CLIENT_URL = '',
   TEST_DB_NAME = '',
   TEST_DB_HOST = 'localhost',
   TEST_DB_PORT = '5432',
@@ -48,5 +52,7 @@ const dbConfig = isTestEnv(NODE_ENV)
 export const config: Config = {
   NODE_ENV,
   LOG_LEVEL,
+  ADMIN_AUTH_KEY,
+  SAAS_CLIENT_URL,
   ...dbConfig
 };

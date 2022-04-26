@@ -9,6 +9,7 @@ import { iff } from 'feathers-hooks-common';
 import { isTest } from './services/hooks/isTest';
 import NodeCache from 'node-cache';
 import { HookContextWithTransaction } from './declarations';
+import { checkAdminKey } from './services/hooks/checkAdminKey';
 
 /**
  * A LRU cache with an expiration of 60 seconds for use of storing transient new relic transaction ids.
@@ -94,7 +95,7 @@ function newRelicTransactionAfter (ctx: HookContextWithTransaction): HookContext
 
 export default {
   before: {
-    all: [logRequest, iff(!isTest, newRelicTransactionBefore)],
+    all: [logRequest, checkAdminKey, iff(!isTest, newRelicTransactionBefore)],
     find: [],
     get: [],
     create: [],
