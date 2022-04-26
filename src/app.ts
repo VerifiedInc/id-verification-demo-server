@@ -18,6 +18,7 @@ import channels from './channels';
 
 import authentication from './authentication';
 import { setupSaaSFeathersServiceClient } from './clients/saasClient';
+import { setupMikroOrm } from './setupMikroOrm';
 
 export type HookContext<T = any> = { app: Application } & FeathersHookContext<T>;
 
@@ -45,6 +46,9 @@ export default async function generateApp (): Promise<Application> {
   // Configure other middleware (see `middleware/index.ts`)
   app.configure(middleware);
   app.configure(authentication);
+
+  // set up mikro-orm
+  await setupMikroOrm(app);
 
   // Set up external feather service clients (see `/clients` directory)
   setupSaaSFeathersServiceClient(app);
