@@ -14,7 +14,7 @@ const mikroOrmConfig: Options = {
   port: config.DB_PORT,
   user: config.DB_USER,
   entities: [
-
+    BaseEntity
   ],
   entitiesTs: ['src/entities'],
   metadataProvider: TsMorphMetadataProvider,
