@@ -83,7 +83,7 @@
     "@types/winston-syslog": "^2.0.3",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
-    "@unumid/types": "git+ssh://git@github.com:UnumID/types.git#3.45.1",
+    "@unumid/types": "git+ssh://git@github.com:UnumID/types.git#3.46.0",
     "axios": "^0.21.1",
     "eslint": "^7.13.0",
     "eslint-config-semistandard": "^15.0.1",
