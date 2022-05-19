@@ -195,7 +195,7 @@ workflows:
                 - main
                 - test-circleci
 
-  build-and-deploy-release:
+  build-and-deploy-sandbox:
     jobs:
       - test:
           filters:
@@ -220,7 +220,7 @@ workflows:
       - deploy-image:
           name : deploy-image-sandbox
           requires:
-            - build-and-push-image
+            - build-and-push-image-sandbox
           context: AWS-Dev
           repo: prove-service
           deployment: prove-service
