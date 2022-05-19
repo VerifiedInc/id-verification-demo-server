@@ -53,6 +53,8 @@ jobs:
       reg:
         type: string
         default: "248606629437.dkr.ecr.us-west-2.amazonaws.com"
+      tag:
+        type: string
       repo:
         type: string
     steps:
@@ -61,43 +63,17 @@ jobs:
       - setup_remote_docker:
           version: 19.03.13
       - run:
+          name: Build and push container image to ECR
           command: |
             echo Logging in to Amazon ECR...
             $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
             echo Building the Docker image...
             DOCKER_BUILDKIT=1 docker build --ssh github="$HOME/.ssh/id_rsa" -t ${CIRCLE_SHA1} .
-            docker tag ${CIRCLE_SHA1} << parameters.reg >>/<< parameters.repo >>:dev-latest
+            docker tag ${CIRCLE_SHA1} << parameters.reg >>/<< parameters.repo >>:<< parameters.tag >>
             docker tag ${CIRCLE_SHA1} << parameters.reg >>/<< parameters.repo >>:"${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
             echo Pushing the Docker image...
             docker push << parameters.reg >>/<< parameters.repo >>:"${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
-            docker push << parameters.reg >>/<< parameters.repo >>:dev-latest
-          name: Update container image
-
-  build-and-push-image-sandbox:
-    executor: aws-cli/default
-    parameters:
-      reg:
-        type: string
-        default: "248606629437.dkr.ecr.us-west-2.amazonaws.com"
-      repo:
-        type: string
-    steps:
-      - checkout
-      - aws-cli/setup
-      - setup_remote_docker:
-          version: 19.03.13
-      - run:
-          command: |
-            echo Logging in to Amazon ECR...
-            $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-            echo Building the Docker image...
-            DOCKER_BUILDKIT=1 docker build --ssh github="$HOME/.ssh/id_rsa" -t ${CIRCLE_SHA1} .
-            docker tag ${CIRCLE_SHA1} << parameters.reg >>/<< parameters.repo >>:sandbox-latest
-            docker tag ${CIRCLE_SHA1} << parameters.reg >>/<< parameters.repo >>:"${CIRCLE_TAG}"
-            echo Pushing the Docker image...
-            docker push << parameters.reg >>/<< parameters.repo >>:"${CIRCLE_TAG}"
-            docker push << parameters.reg >>/<< parameters.repo >>:sandbox-latest
-          name: Update container image
+            docker push << parameters.reg >>/<< parameters.repo >>:<< parameters.tag >>
 
   deploy-image:
     docker: # Referencing the python image here, see https://github.com/CircleCI-Public/aws-eks-orb/issues/52#issuecomment-1006838213
@@ -110,7 +86,8 @@ jobs:
         type: string
       deployment:
         type: string
-
+      tag:
+        type: string
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
@@ -118,9 +95,9 @@ jobs:
           aws-region: ${AWS_REGION}
           cluster-name: << parameters.cluster-name >>
       - run:
-          name: Deploy container image to dev
+          name: Deploy container image, << parameters.tag >>
           command: |
-            kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:"${CIRCLE_BRANCH}-${CIRCLE_PREVIOUS_BUILD_NUM}"
+            kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:<< parameters.tag >>
 
             # Check deployment rollout status every 10 seconds (max 10 minutes) until complete.
             # ref: https://www.jeffgeerling.com/blog/2018/updating-kubernetes-deployment-and-waiting-it-roll-out-shell-script
@@ -139,72 +116,40 @@ jobs:
           event: pass
           template: success_tagged_deploy_1
 
-  deploy-image-sandbox:
-    docker: # Referencing the python image here, see https://github.com/CircleCI-Public/aws-eks-orb/issues/52#issuecomment-1006838213
-      - image: cimg/python:3.10
-    parameters:
-      cluster-name:
-        type: string
-        default: "sandbox-customer-cluster"
-      repo:
-        type: string
-      deployment:
-        type: string
+  # deploy-image-sandbox:
+  #   docker: # Referencing the python image here, see https://github.com/CircleCI-Public/aws-eks-orb/issues/52#issuecomment-1006838213
+  #     - image: cimg/python:3.10
+  #   parameters:
+  #     cluster-name:
+  #       type: string
+  #       default: "sandbox-customer-cluster"
+  #     repo:
+  #       type: string
+  #     deployment:
+  #       type: string
 
-    steps:
-      - kubernetes/install
-      - aws-eks/update-kubeconfig-with-authenticator:
-          install-kubectl: true
-          aws-region: ${AWS_REGION}
-          cluster-name: << parameters.cluster-name >>
-      - run:
-          name: Deploy container image to sandbox
-          command: |
-            kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:"${CIRCLE_TAG}"
+  #   steps:
+  #     - kubernetes/install
+  #     - aws-eks/update-kubeconfig-with-authenticator:
+  #         install-kubectl: true
+  #         aws-region: ${AWS_REGION}
+  #         cluster-name: << parameters.cluster-name >>
+  #     - run:
+  #         name: Deploy container image to sandbox
+  #         command: |
+  #           kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:"${CIRCLE_TAG}"
 
-            # Check deployment rollout status every 10 seconds (max 10 minutes) until complete.
-            # ref: https://www.jeffgeerling.com/blog/2018/updating-kubernetes-deployment-and-waiting-it-roll-out-shell-script
-            ATTEMPTS=0
-            ROLLOUT_STATUS_CMD="kubectl rollout status deployment/<< parameters.deployment >>"
-            until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
-              $ROLLOUT_STATUS_CMD
-              ATTEMPTS=$((attempts + 1))
-              sleep 10
-            done
+  #           # Check deployment rollout status every 10 seconds (max 10 minutes) until complete.
+  #           # ref: https://www.jeffgeerling.com/blog/2018/updating-kubernetes-deployment-and-waiting-it-roll-out-shell-script
+  #           ATTEMPTS=0
+  #           ROLLOUT_STATUS_CMD="kubectl rollout status deployment/<< parameters.deployment >>"
+  #           until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
+  #             $ROLLOUT_STATUS_CMD
+  #             ATTEMPTS=$((attempts + 1))
+  #             sleep 10
+  #           done
 
 workflows:
-  build-and-deploy-release:
-    jobs:
-      - test:
-          filters:
-            tags:
-              only: /^v.*/
-            branches:
-              ignore: /.*/
-
-      # - build-and-push-image-sandbox:
-      #     requires:
-      #       - test
-      #     context: AWS-Dev
-      #     repo: hooli-demo-server
-      #     filters:
-      #       tags:
-      #         only: /^v.*/
-      #       branches:
-      #         ignore: /.*/
-
-      # - deploy-image-sandbox:
-      #     requires:
-      #       - build-and-push-image-sandbox
-      #     context: AWS-Dev
-      #     repo: hooli-demo-server
-      #     deployment: hooli-demo-server
-      #     filters:
-      #       tags:
-      #         only: /^v.*/
-      #       branches:
-      #         ignore: /.*/
-
   lint-and-test:
     jobs:
       - test:
@@ -214,6 +159,7 @@ workflows:
                 - main
                 - test-circleci
                 - sandbox
+
   build-and-deploy:
     jobs:
       - test:
@@ -223,26 +169,67 @@ workflows:
                 - main
                 - test-circleci
 
-      # - build-and-push-image:
-      #     requires:
-      #       - test
-      #     context: AWS-Dev
-      #     repo: hooli-demo-server
-      #     filters:
-      #       branches:
-      #         only:
-      #           - main
-      #           - test-circleci
+      - build-and-push-image:
+          requires:
+            - test
+          context: AWS-Dev
+          repo: prove-service
+          tag: dev-latest
+          filters:
+            branches:
+              only:
+                - main
+                - test-circleci
 
-      # - deploy-image:
-      #     requires:
-      #       - build-and-push-image
-      #     context: AWS-Dev
-      #     repo: hooli-demo-server
-      #     deployment: hooli-demo-server
-      #     filters:
-      #       branches:
-      #         only:
-      #           - main
-      #           - test-circleci
+      - deploy-image:
+          requires:
+            - build-and-push-image
+          context: AWS-Dev
+          repo: prove-service
+          deployment: prove-service
+          cluster-name: "dev-saas-cluster"
+          tag: "${CIRCLE_BRANCH}-${CIRCLE_PREVIOUS_BUILD_NUM}"
+          filters:
+            branches:
+              only:
+                - main
+                - test-circleci
+
+  build-and-deploy-release:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+
+      - build-and-push-image:
+          name : build-and-push-image-sandbox
+          requires:
+            - test
+          context: AWS-Dev
+          repo: prove-service
+          tag: sandbox-latest
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+
+      - deploy-image:
+          name : deploy-image-sandbox
+          requires:
+            - build-and-push-image
+          context: AWS-Dev
+          repo: prove-service
+          deployment: prove-service
+          cluster-name: "sandbox-saas-cluster"
+          tag: "${CIRCLE_TAG}"
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+
 
