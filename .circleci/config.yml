@@ -74,6 +74,10 @@ jobs:
             echo Pushing the Docker image...
             docker push << parameters.reg >>/<< parameters.repo >>:"${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
             docker push << parameters.reg >>/<< parameters.repo >>:<< parameters.tag >>
+      - slack/notify:
+          event: fail
+          mentions: '@devops-team'
+          template: basic_fail_1
 
   deploy-image:
     docker: # Referencing the python image here, see https://github.com/CircleCI-Public/aws-eks-orb/issues/52#issuecomment-1006838213
@@ -88,6 +92,9 @@ jobs:
         type: string
       tag:
         type: string
+      slack_pass_notify_template:
+        type: string
+        default: basic_success_1
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
@@ -114,7 +121,7 @@ jobs:
           template: basic_fail_1
       - slack/notify:
           event: pass
-          template: success_tagged_deploy_1
+          template: << parameters.slack_pass_notify_template >>
 
   # deploy-image-sandbox:
   #   docker: # Referencing the python image here, see https://github.com/CircleCI-Public/aws-eks-orb/issues/52#issuecomment-1006838213
@@ -226,6 +233,7 @@ workflows:
           deployment: prove-service
           cluster-name: "sandbox-saas-cluster"
           tag: "${CIRCLE_TAG}"
+          slack_pass_notify_template: success_tagged_deploy_1
           filters:
             tags:
               only: /^v.*/
