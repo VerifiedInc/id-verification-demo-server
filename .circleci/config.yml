@@ -179,7 +179,9 @@ workflows:
       - build-and-push-image:
           requires:
             - test
-          context: AWS-Dev
+          context:
+            - AWS-Dev
+            - Slack-Context
           repo: prove-service
           tag: dev-latest
           filters:
@@ -191,7 +193,9 @@ workflows:
       - deploy-image:
           requires:
             - build-and-push-image
-          context: AWS-Dev
+          context:
+            - AWS-Dev
+            - Slack-Context
           repo: prove-service
           deployment: prove-service
           cluster-name: "dev-saas-cluster"
@@ -215,7 +219,9 @@ workflows:
           name : build-and-push-image-sandbox
           requires:
             - test
-          context: AWS-Dev
+          context:
+            - AWS-Dev
+            - Slack-Context
           repo: prove-service
           tag: sandbox-latest
           filters:
@@ -228,7 +234,9 @@ workflows:
           name : deploy-image-sandbox
           requires:
             - build-and-push-image-sandbox
-          context: AWS-Dev
+          context:
+            - AWS-Dev
+            - Slack-Context
           repo: prove-service
           deployment: prove-service
           cluster-name: "sandbox-saas-cluster"
