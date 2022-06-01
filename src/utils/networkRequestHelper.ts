@@ -37,6 +37,7 @@ export const makeNetworkRequest = async <T = unknown> (inputObj: RESTData): Prom
   const restHdr: JSONObj = (!inputObj.header ? {} as JSONObj : inputObj.header);
   // Always set the content-type in the header
   restHdr['Content-Type'] = 'application/json';
+  // restHdr['Content-Type'] = 'application/x-www-form-urlencoded';
 
   const url = inputObj.baseUrl + inputObj.endPoint;
   const options = {

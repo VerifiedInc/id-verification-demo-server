@@ -17,6 +17,7 @@ interface Config {
   PROVE_SAAS_URL: string;
   PROVE_USERNAME: string;
   PROVE_PASSWORD: string;
+  PROVE_CLIENT_ID: string;
 }
 
 const {
@@ -32,6 +33,7 @@ const {
   PROVE_SAAS_URL = '',
   PROVE_USERNAME = '',
   PROVE_PASSWORD = '',
+  PROVE_CLIENT_ID = '',
   TEST_DB_NAME = '',
   TEST_DB_HOST = 'localhost',
   TEST_DB_PORT = '5432',
@@ -63,5 +65,6 @@ export const config: Config = {
   PROVE_SAAS_URL,
   PROVE_USERNAME,
   PROVE_PASSWORD,
+  PROVE_CLIENT_ID,
   ...dbConfig
 };
