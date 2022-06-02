@@ -33,7 +33,10 @@ export class IdentityService {
         method: 'POST',
         baseUrl: config.PROVE_SAAS_URL,
         endPoint: `/identity/v2`,
-        header: { Authorization: `Bearer ${authorization}` },
+        header: { 
+          Authorization: `Bearer ${authorization}`,
+          "Content-Type": "application/json" 
+        },
         data: {
           "requestId": uuidv4(),
           "phoneNumber": data.phoneNumber,

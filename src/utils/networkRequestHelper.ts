@@ -16,6 +16,7 @@ import { JSONObj } from '@unumid/types';
   endPoint: string;
   header?: JSONObj;
   data?: JSONObj;
+  formBody?: string[]
 }
 
 /**
@@ -28,6 +29,46 @@ export interface RESTResponse<T = Record<string, unknown>> {
   body: T;
   [key: string]: any;
 }
+
+/**
+ * Helper to handle network requests.
+ * @param inputObj
+ */
+ export const makeFormDataNetworkRequest = async <T = unknown> (inputObj: RESTData): Promise<RESTResponse<T>> => {
+  const restHdr: JSONObj = (!inputObj.header ? {} as JSONObj : inputObj.header);
+  // Always set the content-type in the header
+  restHdr['Content-Type'] = 'application/x-www-form-urlencoded';
+
+  const url = inputObj.baseUrl + inputObj.endPoint;
+  const options = {
+    method: inputObj.method,
+    body: inputObj.formBody?.join('&'),
+    headers: {
+      ...restHdr
+    }
+  };
+  const respObj = {} as RESTResponse<T>;
+
+  logger.debug(`Making ${inputObj.method} request to url: ${url}`);
+
+  const res = await fetch(url, options);
+
+  const responseJson = await res.json() as any;
+  // res.ok will be true for success scenario, otherwise, it will be false.
+  if (res.ok) {
+    logger.debug(`Successful call to ${url}.`);
+
+    // Response object will have both header and body for success scenario
+    respObj.headers = res.headers.raw();
+    respObj.body = responseJson;
+
+    return (respObj);
+  } else {
+    logger.error(`Error in call to ${url}. Error: ${responseJson.code} ${responseJson.message}`);
+    // throw new CustError(responseJson.code, responseJson.message);
+    throw new Error(responseJson.message);
+  }
+};
 
 /**
  * Helper to handle network requests.

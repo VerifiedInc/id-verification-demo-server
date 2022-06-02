@@ -7,7 +7,7 @@ import { config } from '../../config';
 import { Application } from '../../declarations';
 // import { UserEntity } from '../../entities/User';
 import logger from '../../logger';
-import { makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
+import { makeFormDataNetworkRequest, makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
 // import { generateEmailVerificationToken } from '../../utils/generateEmailVerificationToken';
 
 interface AuthTokens {
@@ -25,19 +25,29 @@ export class AuthService {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   // async create (data: any, params?: Params): Promise<AuthTokens> {
     async create (data: any, params?: Params): Promise<AuthTokens> {
+      const formBody = [];
+
+      const encodedKeyU = encodeURIComponent("username");
+      const encodedValueU = encodeURIComponent(config.PROVE_USERNAME);
+      formBody.push(encodedKeyU + "=" + encodedValueU);
+
+      const encodedKeyP = encodeURIComponent("password");
+      const encodedValueP = encodeURIComponent(config.PROVE_PASSWORD);
+      formBody.push(encodedKeyP + "=" + encodedValueP);
+
+      const encodedKeyG = encodeURIComponent("grant_type");
+      const encodedValueG = encodeURIComponent("password");
+      formBody.push(encodedKeyG + "=" + encodedValueG);
+      
     const restData: RESTData = {
       method: 'POST',
       baseUrl: config.PROVE_SAAS_URL,
       endPoint: `/token`,
       header: { },
-      data: {
-        username: config.PROVE_USERNAME,
-        password: config.PROVE_PASSWORD,
-        grant_type: 'password'
-      }
+      formBody
     };
 
-    const response = await makeNetworkRequest<AuthTokens>(restData);
+    const response = await makeFormDataNetworkRequest<AuthTokens>(restData);
     // console.log('response', response);
     // const authToken = handleAuthTokenHeader(response, authorization);
     
