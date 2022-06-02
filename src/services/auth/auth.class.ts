@@ -1,14 +1,8 @@
-import { BadRequest } from '@feathersjs/errors';
 import { Params } from '@feathersjs/feathers';
 import { config } from '../../config';
-// import { VerificationOptions, WalletUserDto } from '@unumid/web-wallet-types';
-// import { EMAIL_CONTENT } from '../../constants';
-
 import { Application } from '../../declarations';
-// import { UserEntity } from '../../entities/User';
 import logger from '../../logger';
-import { makeFormDataNetworkRequest, makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
-// import { generateEmailVerificationToken } from '../../utils/generateEmailVerificationToken';
+import { makeFormDataNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
 
 interface AuthTokens {
   accessToken: string;
