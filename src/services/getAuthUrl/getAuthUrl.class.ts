@@ -1,17 +1,12 @@
-import { BadRequest } from '@feathersjs/errors';
 import { Params } from '@feathersjs/feathers';
 import { config } from '../../config';
-// import { VerificationOptions, WalletUserDto } from '@unumid/web-wallet-types';
-// import { EMAIL_CONTENT } from '../../constants';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Application, ProveServiceResponseV1 } from '../../declarations';
-// import { UserEntity } from '../../entities/User';
+
 import logger from '../../logger';
 import { makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
-import { Configuration } from '@mikro-orm/core';
 import { sendSms } from '../../utils/sendSms';
-// import { generateEmailVerificationToken } from '../../utils/generateEmailVerificationToken';
 
 export interface AuthUrlResponse {
   AuthenticationUrl: string;

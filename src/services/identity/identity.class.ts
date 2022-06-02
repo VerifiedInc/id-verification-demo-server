@@ -1,20 +1,36 @@
-import { BadRequest } from '@feathersjs/errors';
 import { Params } from '@feathersjs/feathers';
 import { config } from '../../config';
-// import { VerificationOptions, WalletUserDto } from '@unumid/web-wallet-types';
-// import { EMAIL_CONTENT } from '../../constants';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Application } from '../../declarations';
-// import { UserEntity } from '../../entities/User';
+import { Application, ProveServiceResponseV2 } from '../../declarations';
 import logger from '../../logger';
 import { makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
-import { Configuration } from '@mikro-orm/core';
-// import { generateEmailVerificationToken } from '../../utils/generateEmailVerificationToken';
 
-interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
+export interface Address {
+  address: string;
+  extendedAddress: string;
+  city: string;
+  region: string,
+  postalCode: string;
+}
+
+export interface IndividualInfoDetailed {
+  firstName: string,
+  lastName: string,
+  addresses: Address[],
+  emailAddresses: string[],
+  ssn: string,
+  dob: string
+}
+
+export interface identityResponse {
+  transactionId: string;
+  phoneNumber: string;
+  lineType: string,
+  carrier: string,
+  countryCode: string,
+  reasonCodes: string[],
+  individual: IndividualInfoDetailed
 }
 
 export class IdentityService {
@@ -25,7 +41,7 @@ export class IdentityService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async create (data: any, params?: Params): Promise<AuthTokens> {
+    async create (data: any, params?: Params): Promise<ProveServiceResponseV2<identityResponse>> {
       const authorization = params?.authentication?.accessToken;
 
       const restData: RESTData = {
@@ -45,8 +61,8 @@ export class IdentityService {
       }
     };
 
-    const response = await makeNetworkRequest<AuthTokens>(restData);
-    
+    const response = await makeNetworkRequest<ProveServiceResponseV2<identityResponse>>(restData);
+
     return response.body;
   }
 }

@@ -1,20 +1,15 @@
-import { BadRequest } from '@feathersjs/errors';
 import { Params } from '@feathersjs/feathers';
 import { config } from '../../config';
-// import { VerificationOptions, WalletUserDto } from '@unumid/web-wallet-types';
-// import { EMAIL_CONTENT } from '../../constants';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Application } from '../../declarations';
-// import { UserEntity } from '../../entities/User';
+import { Application, ProveServiceResponseV1 } from '../../declarations';
 import logger from '../../logger';
 import { makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
-import { Configuration } from '@mikro-orm/core';
-// import { generateEmailVerificationToken } from '../../utils/generateEmailVerificationToken';
 
-interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
+interface AuthPathResponse {
+  TransactionId: string,
+  Path: string,
+  SessionId: string;
 }
 
 export class GetAuthPathService {
@@ -25,7 +20,7 @@ export class GetAuthPathService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async create (data: any, params?: Params): Promise<AuthTokens> {
+    async create (data: any, params?: Params): Promise<ProveServiceResponseV1<AuthPathResponse>> {
 
       const restData: RESTData = {
         method: 'POST',
@@ -38,7 +33,7 @@ export class GetAuthPathService {
       }
     };
 
-    const response = await makeNetworkRequest<AuthTokens>(restData);
+    const response = await makeNetworkRequest<ProveServiceResponseV1<AuthPathResponse>>(restData);
 
     return response.body;
   }
