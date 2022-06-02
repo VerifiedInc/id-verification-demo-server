@@ -25,7 +25,6 @@ export class GetAuthUrlService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // async create (data: any, params?: Params): Promise<AuthTokens> {
     async create (data: any, params?: Params): Promise<AuthTokens> {
       const authorization = data.authorization;
 
@@ -45,30 +44,6 @@ export class GetAuthUrlService {
     };
 
     const response = await makeNetworkRequest<AuthTokens>(restData);
-    // console.log('response', response);
-    // const authToken = handleAuthTokenHeader(response, authorization);
-    
-
-    // if (!user) {
-    //   throw new Error('User not found');
-    // }
-
-    // if (data.token !== user.emailVerificationToken) {
-    //   throw new BadRequest('The code you entered isn\'t valid. Please try again.');
-    // }
-
-    // // if the user has already verified once before then no need to send welcome email again.
-    // if (!user.isEmailVerified) {
-    //   this.sendWelcomeEmail(user);
-    // }
-
-    // const updatedUser: UserEntity = await userService.patch(
-    //   user.uuid,
-    //   { isEmailVerified: true, emailVerificationToken: undefined },
-    //   { populate: ['webauthnCredentials'] }
-    // ) as UserEntity;
-
-    // return updatedUser.toDto();
 
     return response.body;
   }
