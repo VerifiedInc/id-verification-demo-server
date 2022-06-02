@@ -33,3 +33,19 @@ export interface HookContextWithTransaction<T = any, S = Service<T>, R = T> exte
 export interface HookVariableContext<K, T> extends FeathersHookContext {
   K?: T;
 }
+
+export interface ProveServiceResponseV1<T> {
+    RequestId: string;
+    Status: number;
+    Description: "Success";
+    AdditionalInfo: string;
+    Response: T;
+}
+
+export interface ProveServiceResponseV2<T> {
+  requestId: string;
+  status: number;
+  description: "Success";
+  additionalInfo: string;
+  response: T;
+}

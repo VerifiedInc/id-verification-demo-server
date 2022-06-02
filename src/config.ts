@@ -14,6 +14,13 @@ interface Config {
   DB_USER: string;
   DB_PASSWORD: string;
   SAAS_CLIENT_URL: string;
+  PROVE_SAAS_URL: string;
+  PROVE_USERNAME: string;
+  PROVE_PASSWORD: string;
+  PROVE_CLIENT_ID: string;
+  FROM_NUMBER: string;
+  ACCOUNT_SID: string;
+  AUTH_TOKEN: string;
 }
 
 const {
@@ -26,6 +33,13 @@ const {
   DB_USER = '',
   DB_PASSWORD = '',
   SAAS_CLIENT_URL = '',
+  PROVE_SAAS_URL = '',
+  PROVE_USERNAME = '',
+  PROVE_PASSWORD = '',
+  PROVE_CLIENT_ID = '',
+  FROM_NUMBER = '',
+  ACCOUNT_SID = '',
+  AUTH_TOKEN = '',
   TEST_DB_NAME = '',
   TEST_DB_HOST = 'localhost',
   TEST_DB_PORT = '5432',
@@ -54,5 +68,12 @@ export const config: Config = {
   LOG_LEVEL,
   ADMIN_AUTH_KEY,
   SAAS_CLIENT_URL,
+  PROVE_SAAS_URL,
+  PROVE_USERNAME,
+  PROVE_PASSWORD,
+  PROVE_CLIENT_ID,
+  FROM_NUMBER,
+  ACCOUNT_SID,
+  AUTH_TOKEN,
   ...dbConfig
 };
