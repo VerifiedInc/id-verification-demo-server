@@ -18,6 +18,9 @@ interface Config {
   PROVE_USERNAME: string;
   PROVE_PASSWORD: string;
   PROVE_CLIENT_ID: string;
+  FROM_NUMBER: string;
+  ACCOUNT_SID: string;
+  AUTH_TOKEN: string;
 }
 
 const {
@@ -34,6 +37,9 @@ const {
   PROVE_USERNAME = '',
   PROVE_PASSWORD = '',
   PROVE_CLIENT_ID = '',
+  FROM_NUMBER = '',
+  ACCOUNT_SID = '',
+  AUTH_TOKEN = '',
   TEST_DB_NAME = '',
   TEST_DB_HOST = 'localhost',
   TEST_DB_PORT = '5432',
@@ -66,5 +72,8 @@ export const config: Config = {
   PROVE_USERNAME,
   PROVE_PASSWORD,
   PROVE_CLIENT_ID,
+  FROM_NUMBER,
+  ACCOUNT_SID,
+  AUTH_TOKEN,
   ...dbConfig
 };

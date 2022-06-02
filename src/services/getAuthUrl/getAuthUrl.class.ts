@@ -5,16 +5,17 @@ import { config } from '../../config';
 // import { EMAIL_CONTENT } from '../../constants';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Application } from '../../declarations';
+import { Application, ProveServiceResponseV1 } from '../../declarations';
 // import { UserEntity } from '../../entities/User';
 import logger from '../../logger';
 import { makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
 import { Configuration } from '@mikro-orm/core';
+import { sendSms } from '../../utils/sendSms';
 // import { generateEmailVerificationToken } from '../../utils/generateEmailVerificationToken';
 
-interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
+export interface AuthUrlResponse {
+  AuthenticationUrl: string;
+  MobileOperatorName: string;
 }
 
 export class GetAuthUrlService {
@@ -25,7 +26,7 @@ export class GetAuthUrlService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async create (data: any, params?: Params): Promise<AuthTokens> {
+    async create (data: any, params?: Params): Promise<ProveServiceResponseV1<AuthUrlResponse>> {
       const authorization = data.authorization;
 
       const restData: RESTData = {
@@ -43,7 +44,10 @@ export class GetAuthUrlService {
       }
     };
 
-    const response = await makeNetworkRequest<AuthTokens>(restData);
+    const response = await makeNetworkRequest<ProveServiceResponseV1<AuthUrlResponse>>(restData);
+
+    // send sms to mobile number
+    const result = await sendSms(data.mobileNumber, response.body.Response.AuthenticationUrl);
 
     return response.body;
   }
