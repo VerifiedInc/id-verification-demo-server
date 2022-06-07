@@ -1,6 +1,6 @@
 import { Params } from '@feathersjs/feathers';
 import { config } from '../../config';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, v4 } from 'uuid';
 
 import { Application, ProveServiceResponseV2 } from '../../declarations';
 import logger from '../../logger';
@@ -24,6 +24,12 @@ interface ssnCredentialSubject extends CredentialData {
 interface dobCredentialSubject extends CredentialData {
   id: string;
   dob: string;
+}
+
+export interface WalletUserDidAssociation<T> {
+  proveResponse: ProveServiceResponseV2<T>
+  userCode: string;
+  issuerDid: string;
 }
 
 export interface Address {
@@ -63,7 +69,7 @@ export class IdentityService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async create (data: any, params?: Params): Promise<ProveServiceResponseV2<identityResponse>> {
+    async create (data: any, params?: Params): Promise<WalletUserDidAssociation<identityResponse>> {
       // const authorization = params?.authentication?.accessToken;
 
       const authService = this.app.service('auth');
@@ -95,6 +101,7 @@ export class IdentityService {
       dob: identityData.individual.dob,
       ssn: identityData.individual.ssn,
       phone: identityData.phoneNumber,
+      userCode: v4()
     };
 
     const userEntity = await this.userEntityService.create(userEntityOptions, params);
@@ -102,9 +109,9 @@ export class IdentityService {
 
     // // issue credentials for user
     
-    // // get issuer
-    // const issuerEntityService = this.app.service('issuerEntity');
-    // const issuer: IssuerEntity = await issuerEntityService.getDefaultIssuerEntity();
+    // get issuer
+    const issuerEntityService = this.app.service('issuerEntity');
+    const issuer: IssuerEntity = await issuerEntityService.getDefaultIssuerEntity();
 
     // // issue credentials
     // const phoneCredentialSubject = {
@@ -113,6 +120,10 @@ export class IdentityService {
 
     // await issueCredentials(issuer.authToken, issuer.did, did, [emailCredentialSubject], issuer.signingPrivateKey);
 
-    return response.body;
+    return {
+      userCode: userEntity.userCode as string,
+      issuerDid: issuer.did,
+      proveResponse: response.body
+    }
   }
 }
