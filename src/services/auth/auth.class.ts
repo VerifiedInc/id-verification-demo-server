@@ -5,8 +5,8 @@ import logger from '../../logger';
 import { makeFormDataNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
 
 interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
+  access_token: string;
+  refresh_token: string;
 }
 
 export class AuthService {

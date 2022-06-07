@@ -34,7 +34,7 @@ export class GetAuthUrlService {
           "SessionId": "SubmittedSessionId", // TODO
           "ApiClientId": config.PROVE_CLIENT_ID,
           "SourceIp": "127.0.0.1", // TODO
-          "FinalTargetUrl": "http://www.myurl.com/finish",
+          "FinalTargetUrl": data.finalTargetUrl,
           "MobileNumber": data.mobileNumber,
       }
     };

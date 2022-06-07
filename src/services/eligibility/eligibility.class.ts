@@ -25,7 +25,11 @@ export class EligibilityService {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async create (data: any, params?: Params): Promise<ProveServiceResponseV2<EligibilityResponse>> {
-      const authorization = params?.authentication?.accessToken;
+      // const authorization = params?.authentication?.accessToken;
+
+      const authService = this.app.service('auth');
+      const authResponse = await authService.create({}, params);
+      const authorization = authResponse['access_token'];
 
       const restData: RESTData = {
         method: 'POST',
