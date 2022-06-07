@@ -47,14 +47,16 @@ export const validateUserCreateOptions: Hook<UserCreateOptions> = (ctx) => {
 };
 
 export const makeUserDtoFromEntity = (entity: UserEntity): UserDto => {
-  const { uuid, phone, firstName, did, userCode } = entity;
+  const { uuid, phone, firstName, did, userCode, dob, ssn } = entity;
 
   return {
     uuid,
     phone,
     did,
     firstName,
-    userCode
+    userCode,
+    dob,
+    ssn
   };
 };
 

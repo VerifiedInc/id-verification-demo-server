@@ -7,6 +7,7 @@ import IdentityService from './identity/identity.service';
 import IssuerService from './issuer/issuer.service';
 import IssuerEntityService from './issuerEntity/issuerEntity.service';
 import UserService from './user/user.service';
+import UserCredentialRequestsService from './userCredentialRequests/userCredentialRequests.service';
 import UserEntityService from './userEntity/userEntity.service';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -20,4 +21,5 @@ export default function (app: Application): void {
     app.configure(IdentityService);
     app.configure(IssuerEntityService);
     app.configure(IssuerService);
+    app.configure(UserCredentialRequestsService)
 }
