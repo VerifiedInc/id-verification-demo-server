@@ -8,7 +8,7 @@ import { hooks } from './user.hooks';
 // Add this service to the service type index
 declare module '../../declarations' {
   interface ServiceTypes {
-    user: UserService & ServiceAddons<UserEntity>
+    user: UserService & ServiceAddons<any>
   }
 }
 

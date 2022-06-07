@@ -1,6 +1,5 @@
 import { NotFound } from '@feathersjs/errors';
 import { Application, NullableId, Paginated, Params } from '@feathersjs/feathers';
-import { WalletUserCreateOptions } from '@unumid/web-wallet-types';
 import { AxiosResponse } from 'axios';
 import { config } from '../../config';
 import { UserEntity, UserEntityOptions } from '../../entities/User';
@@ -13,16 +12,10 @@ interface ServiceOptions {}
 
 export interface UserDto {
   uuid: string;
-  email: string;
-  referralCode: string;
-  referralUrl: string;
-  signature: string;
+  firstName?: string;
   did?: string;
-  referredBy?: string;
-  gmailHistoryId?: number;
-  gmailAccessToken?: string;
-  gmailRefreshToken?: string;
-  gmailAccessTokenExpiration?: Date;
+  userCode?: string;
+  phone: string;
 }
 
 export class UserService {
@@ -39,12 +32,12 @@ export class UserService {
   async create (data: UserEntityOptions, params?: Params): Promise<UserEntity> {
     let entity: UserEntity;
 
-    // ensure that a user with the email does not already exist
+    // ensure that a user with the phone does not already exist
     try {
-      entity = await this.entityService.getByEmail(data.email);
+      entity = await this.entityService.getByEmail(data.phone);
 
       if (entity) {
-        logger.info(`User with email ${data.email} already exists with uuid ${entity.uuid}`);
+        logger.info(`User with email ${data.phone} already exists with uuid ${entity.uuid}`);
         return entity;
       }
     } catch (e) {
@@ -103,58 +96,5 @@ export class UserService {
       logger.error('UserService.patch caught an error thrown by UserEntityService.patch', e);
       throw e;
     }
-  }
-
-  /**
-   * Remove user functionality. This is strictly for internal testing usage to allow for resetting verified emails.
-   * @param uuid
-   * @param params
-   * @returns
-   */
-  async remove (uuid: NullableId, params?: Params): Promise<{success: boolean} | UserEntity> {
-    let entity: UserEntity | {success: boolean};
-    try {
-      // First get the user. This is ensure that a query that can not be written that hits all records in the db by accident.
-      entity = await this.entityService.get(uuid);
-
-      if (!entity) {
-        logger.info(`User with uuid ${uuid} does not exist`);
-        throw new NotFound(`User with uuid ${uuid} does not exist`);
-      }
-
-      // then remove the user from the wallet db
-      const walletClient = this.app.get('wallet');
-
-      try {
-        // call out to the wallet server to delete the user from the wallet db
-        const response: AxiosResponse = await walletClient.service('user').remove(
-          null,
-          {
-            query: {
-              where: {
-                email: entity.email, referralCode: entity.referralCode
-              } as WalletUserCreateOptions
-            },
-            headers: { Authorization: formatBearerToken(config.WALLET_ADMIN_AUTH_KEY) }
-          });
-
-        const user = response.data as UserDto;
-
-        if (!user) {
-          throw new Error('No user delete in wallet server');
-        }
-        logger.info(`Successfully delete response from wallet server in regard to user with email ${user.email} and uuid ${user.uuid}`);
-      } catch (e) {
-        logger.error('User.remove caught an error thrown by walletClient.User.delete', e);
-        throw e;
-      }
-
-      entity = await this.entityService.remove(uuid, params);
-    } catch (e) {
-      logger.error('UserService.remove caught an error thrown by UserEntityService.remove', e);
-      throw e;
-    }
-
-    return entity;
   }
 }
