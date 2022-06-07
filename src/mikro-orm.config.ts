@@ -4,6 +4,7 @@ import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 
 import { config } from './config';
 import { BaseEntity } from './entities/BaseEntity';
+import { UserEntity } from './entities/User';
 
 const mikroOrmConfig: Options = {
   baseDir: process.cwd(),
@@ -14,7 +15,7 @@ const mikroOrmConfig: Options = {
   port: config.DB_PORT,
   user: config.DB_USER,
   entities: [
-    BaseEntity
+    UserEntity
   ],
   entitiesTs: ['src/entities'],
   metadataProvider: TsMorphMetadataProvider,

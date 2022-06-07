@@ -66,6 +66,9 @@ export class IdentityService {
     };
 
     const response = await makeNetworkRequest<ProveServiceResponseV2<identityResponse>>(restData);
+    const identityData: identityResponse = response.body.response;
+
+    // issue credentials for user
 
     return response.body;
   }
