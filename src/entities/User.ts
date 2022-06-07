@@ -8,6 +8,8 @@ export interface UserEntityOptions extends BaseEntityOptions {
   firstName?: string;
   did?: string;
   userCode?: string;
+  ssn: string;
+  dob: string;
 }
 
 @Entity({ tableName: 'User' })
@@ -20,6 +22,8 @@ export class UserEntity extends BaseEntity {
     this.did = options.did;
     this.firstName = options.firstName;
     this.userCode = options.userCode;
+    this.ssn = options.ssn;
+    this.dob = options.dob;
   }
 
   // @Property({ unique: true })
@@ -27,6 +31,12 @@ export class UserEntity extends BaseEntity {
 
   @Property()
   phone: string;
+
+  @Property()
+  dob: string;
+
+  @Property()
+  ssn: string;
 
   @Property()
   did?: string;

@@ -5,6 +5,26 @@ import { v4 as uuidv4 } from 'uuid';
 import { Application, ProveServiceResponseV2 } from '../../declarations';
 import logger from '../../logger';
 import { makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
+import { IssuerEntity } from '../../entities/Issuer';
+import { issueCredentials } from '@unumid/server-sdk';
+import { CredentialData } from '@unumid/types';
+import { UserEntityOptions } from '../../entities/User';
+import { UserEntityService } from '../userEntity/userEntity.class';
+
+interface phoneCredentialSubject extends CredentialData {
+  id: string;
+  phone: string;
+}
+
+interface ssnCredentialSubject extends CredentialData {
+  id: string;
+  ssn: string;
+}
+
+interface dobCredentialSubject extends CredentialData {
+  id: string;
+  dob: string;
+}
 
 export interface Address {
   address: string;
@@ -35,9 +55,11 @@ export interface identityResponse {
 
 export class IdentityService {
   app: Application;
+  userEntityService: UserEntityService;
 
   constructor (app: Application) {
     this.app = app;
+    this.userEntityService = app.service('userEntity');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -68,7 +90,28 @@ export class IdentityService {
     const response = await makeNetworkRequest<ProveServiceResponseV2<identityResponse>>(restData);
     const identityData: identityResponse = response.body.response;
 
-    // issue credentials for user
+    // need to store the data until the user has a did to issue credentials to
+    const userEntityOptions: UserEntityOptions = {
+      dob: identityData.individual.dob,
+      ssn: identityData.individual.ssn,
+      phone: identityData.phoneNumber,
+    };
+
+    const userEntity = await this.userEntityService.create(userEntityOptions, params);
+
+
+    // // issue credentials for user
+    
+    // // get issuer
+    // const issuerEntityService = this.app.service('issuerEntity');
+    // const issuer: IssuerEntity = await issuerEntityService.getDefaultIssuerEntity();
+
+    // // issue credentials
+    // const phoneCredentialSubject = {
+    //   id: 
+    // }
+
+    // await issueCredentials(issuer.authToken, issuer.did, did, [emailCredentialSubject], issuer.signingPrivateKey);
 
     return response.body;
   }
