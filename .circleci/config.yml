@@ -164,7 +164,7 @@ workflows:
             - Slack-Context
           repo: id-verification-demo-server
           deployment: id-verification-demo-server
-          cluster-name: "dev-saas-cluster"
+          cluster-name: "dev-customer-cluster"
           tag: "${CIRCLE_BRANCH}-${CIRCLE_PREVIOUS_BUILD_NUM}"
           filters:
             branches:
@@ -205,7 +205,7 @@ workflows:
             - Slack-Context
           repo: id-verification-demo-server
           deployment: id-verification-demo-server
-          cluster-name: "sandbox-saas-cluster"
+          cluster-name: "sandbox-customer-cluster"
           tag: "${CIRCLE_TAG}"
           slack_pass_notify_template: success_tagged_deploy_1
           filters:
