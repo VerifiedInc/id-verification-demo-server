@@ -20,16 +20,15 @@ export class GetAuthPathService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async create (data: any, params?: Params): Promise<ProveServiceResponseV1<AuthPathResponse>> {
-
-      const restData: RESTData = {
-        method: 'POST',
-        baseUrl: config.PROVE_SAAS_URL,
-        endPoint: `/fortified/2015/06/01/getAuthPath`,
-        data: {
-          "RequestId": uuidv4(),
-          "ApiClientId": config.PROVE_CLIENT_ID,
-          "VerificationFingerprint": data.verificationFingerprint,
+  async create (data: any, params?: Params): Promise<ProveServiceResponseV1<AuthPathResponse>> {
+    const restData: RESTData = {
+      method: 'POST',
+      baseUrl: config.PROVE_SAAS_URL,
+      endPoint: '/fortified/2015/06/01/getAuthPath',
+      data: {
+        RequestId: uuidv4(),
+        ApiClientId: config.PROVE_CLIENT_ID,
+        VerificationFingerprint: data.verificationFingerprint
       }
     };
 

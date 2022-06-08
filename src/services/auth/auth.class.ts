@@ -5,8 +5,10 @@ import logger from '../../logger';
 import { makeFormDataNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
 
 interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
+  /* eslint-disable camelcase */
+  access_token: string;
+  /* eslint-disable camelcase */
+  refresh_token: string;
 }
 
 export class AuthService {
@@ -17,25 +19,25 @@ export class AuthService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async create (data: any, params?: Params): Promise<AuthTokens> {
-      const formBody = [];
+  async create (data: any, params?: Params): Promise<AuthTokens> {
+    const formBody = [];
 
-      const encodedKeyU = encodeURIComponent("username");
-      const encodedValueU = encodeURIComponent(config.PROVE_USERNAME);
-      formBody.push(encodedKeyU + "=" + encodedValueU);
+    const encodedKeyU = encodeURIComponent('username');
+    const encodedValueU = encodeURIComponent(config.PROVE_USERNAME);
+    formBody.push(encodedKeyU + '=' + encodedValueU);
 
-      const encodedKeyP = encodeURIComponent("password");
-      const encodedValueP = encodeURIComponent(config.PROVE_PASSWORD);
-      formBody.push(encodedKeyP + "=" + encodedValueP);
+    const encodedKeyP = encodeURIComponent('password');
+    const encodedValueP = encodeURIComponent(config.PROVE_PASSWORD);
+    formBody.push(encodedKeyP + '=' + encodedValueP);
 
-      const encodedKeyG = encodeURIComponent("grant_type");
-      const encodedValueG = encodeURIComponent("password");
-      formBody.push(encodedKeyG + "=" + encodedValueG);
-      
+    const encodedKeyG = encodeURIComponent('grant_type');
+    const encodedValueG = encodeURIComponent('password');
+    formBody.push(encodedKeyG + '=' + encodedValueG);
+
     const restData: RESTData = {
       method: 'POST',
       baseUrl: config.PROVE_SAAS_URL,
-      endPoint: `/token`,
+      endPoint: '/token',
       header: { },
       formBody
     };

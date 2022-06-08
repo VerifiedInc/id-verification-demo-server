@@ -21,21 +21,21 @@ export class GetAuthUrlService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async create (data: any, params?: Params): Promise<ProveServiceResponseV1<AuthUrlResponse>> {
-      const authorization = data.authorization;
+  async create (data: any, params?: Params): Promise<ProveServiceResponseV1<AuthUrlResponse>> {
+    const authorization = data.authorization;
 
-      const restData: RESTData = {
-        method: 'POST',
-        baseUrl: config.PROVE_SAAS_URL,
-        endPoint: `/fortified/2015/06/01/getAuthUrl`,
-        // header: { Authorization: authorization },
-        data: {
-          "RequestId": uuidv4(),
-          "SessionId": "SubmittedSessionId", // TODO
-          "ApiClientId": config.PROVE_CLIENT_ID,
-          "SourceIp": "127.0.0.1", // TODO
-          "FinalTargetUrl": "http://www.myurl.com/finish",
-          "MobileNumber": data.mobileNumber,
+    const restData: RESTData = {
+      method: 'POST',
+      baseUrl: config.PROVE_SAAS_URL,
+      endPoint: '/fortified/2015/06/01/getAuthUrl',
+      // header: { Authorization: authorization },
+      data: {
+        RequestId: uuidv4(),
+        SessionId: 'SubmittedSessionId', // TODO
+        ApiClientId: config.PROVE_CLIENT_ID,
+        SourceIp: '127.0.0.1', // TODO
+        FinalTargetUrl: data.finalTargetUrl,
+        MobileNumber: data.mobileNumber
       }
     };
 
