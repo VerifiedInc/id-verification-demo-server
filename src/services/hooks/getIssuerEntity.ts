@@ -2,13 +2,13 @@ import { Hook } from '@feathersjs/feathers';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
 
-export const getIssuerEntity: (did: string) => Hook = (did: string) => async (ctx) => {
+export const getIssuerEntity: Hook = async (ctx) => {
+// export const handleUserDidAssociation: Hook = async (ctx) => {
   console.log('getIssuerEntity');
-  console.log('did', did);
-  const issuerDataService = ctx.app.service('issuerEntity');
+  const issuerEntityService = ctx.app.service('issuerEntity');
   let issuerEntity: IssuerEntity;
   try {
-    issuerEntity = await issuerDataService.getDefaultIssuerEntity;
+    issuerEntity = await issuerEntityService.getDefaultIssuerEntity();
     console.log('issuerEntity', issuerEntity);
 
     return {

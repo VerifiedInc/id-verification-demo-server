@@ -5,9 +5,17 @@ import { Hook } from '@feathersjs/feathers';
 import { getIssuerEntity } from '../hooks/getIssuerEntity';
 import { handleUserDidAssociation } from '../hooks/handleUserDidAssociation';
 import { validateCredentialRequest } from '../hooks/validateCredentialRequest';
+import logger from '../../logger';
 
 const validateUserCredentialRequest: Hook = async (ctx) => {
   const data = ctx.data as SubjectCredentialRequestsEnrichedDto;
+  const { params } = ctx;
+
+  if (!params.headers?.version) {
+    logger.info('CredentialRequest request made without version');
+  } else {
+    logger.info(`CredentialRequest request made with version ${params.headers?.version}`);
+  }
 
   if (!data) {
     throw new BadRequest('Invalid body must be defined.');
@@ -22,7 +30,7 @@ const validateUserCredentialRequest: Hook = async (ctx) => {
 
 export const hooks = {
   before: {
-    all: [validateCredentialRequest],
+    // all: [validateCredentialRequest],
     create: [getIssuerEntity, validateUserCredentialRequest, handleUserDidAssociation]
   },
   after: {}
