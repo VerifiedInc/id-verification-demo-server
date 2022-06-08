@@ -148,7 +148,7 @@ workflows:
           context:
             - AWS-Dev
             - Slack-Context
-          repo: prove-service
+          repo: id-verification-demo-server
           tag: dev-latest
           filters:
             branches:
@@ -162,9 +162,9 @@ workflows:
           context:
             - AWS-Dev
             - Slack-Context
-          repo: prove-service
-          deployment: prove-service
-          cluster-name: "dev-saas-cluster"
+          repo: id-verification-demo-server
+          deployment: id-verification-demo-server
+          cluster-name: "dev-customer-cluster"
           tag: "${CIRCLE_BRANCH}-${CIRCLE_PREVIOUS_BUILD_NUM}"
           filters:
             branches:
@@ -188,7 +188,7 @@ workflows:
           context:
             - AWS-Dev
             - Slack-Context
-          repo: prove-service
+          repo: id-verification-demo-server
           tag: sandbox-latest
           filters:
             tags:
@@ -203,9 +203,9 @@ workflows:
           context:
             - AWS-Dev
             - Slack-Context
-          repo: prove-service
-          deployment: prove-service
-          cluster-name: "sandbox-saas-cluster"
+          repo: id-verification-demo-server
+          deployment: id-verification-demo-server
+          cluster-name: "sandbox-customer-cluster"
           tag: "${CIRCLE_TAG}"
           slack_pass_notify_template: success_tagged_deploy_1
           filters:
