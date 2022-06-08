@@ -30,7 +30,6 @@ const validateUserCredentialRequest: Hook = async (ctx) => {
 
 export const hooks = {
   before: {
-    // all: [validateCredentialRequest],
     create: [getIssuerEntity, validateUserCredentialRequest, handleUserDidAssociation]
   },
   after: {}

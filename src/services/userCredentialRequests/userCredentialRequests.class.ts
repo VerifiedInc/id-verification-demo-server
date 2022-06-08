@@ -119,11 +119,11 @@ export class UserCredentialRequestsService {
 
     // update the default issuer's auth token if it has been reissued
     if (issuerDto.authToken !== issuer.authToken) {
-      const issuerDataService = this.app.service('issuerData');
+      const userEntityService = this.app.service('issuerEntity');
       try {
-        await issuerDataService.patch(issuer.uuid, { authToken: issuerDto.authToken });
+        await userEntityService.patch(issuer.uuid, { authToken: issuerDto.authToken });
       } catch (e) {
-        logger.error('CredentialRequest create caught an error thrown by issuerDataService.patch', e);
+        logger.error('CredentialRequest create caught an error thrown by userEntityService.patch', e);
         throw e;
       }
     }

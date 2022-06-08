@@ -61,9 +61,9 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
   // verify the subject did document
   const result: UnumDto<VerifiedStatus> = await verifySignedDid(issuer.authToken, issuer.did, did);
 
-  // if (!result.body.isVerified) {
-  //   throw new Error(`${result.body.message} Subject DID document ${did.id} for user ${userCode} is not verified.`);
-  // }
+  if (!result.body.isVerified) {
+    throw new Error(`${result.body.message} Subject DID document ${did.id} for user ${userCode} is not verified.`);
+  }
 
   const userDid = did.id;
 
@@ -83,11 +83,11 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
 
   // update the default issuer's auth token if it has been reissued
   if (result.authToken !== issuer.authToken) {
-    const issuerDataService = app.service('issuerData');
+    const issuerEntityService = app.service('issuerEntity');
     try {
-      await issuerDataService.patch(issuer.uuid, { authToken: result.authToken });
+      await issuerEntityService.patch(issuer.uuid, { authToken: result.authToken });
     } catch (e) {
-      logger.error('CredentialRequest create caught an error thrown by issuerDataService.patch', e);
+      logger.error('CredentialRequest create caught an error thrown by issuerEntityService.patch', e);
       throw e;
     }
   }
