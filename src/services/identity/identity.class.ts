@@ -70,8 +70,7 @@ export class IdentityService {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create (data: any, params?: Params): Promise<WalletUserDidAssociation<identityResponse>> {
-    // const authorization = params?.authentication?.accessToken;
-
+    
     const authService = this.app.service('auth');
     const authResponse = await authService.create({}, params);
     const authorization = authResponse.access_token;
@@ -106,18 +105,9 @@ export class IdentityService {
 
     const userEntity = await this.userEntityService.create(userEntityOptions, params);
 
-    // // issue credentials for user
-
     // get issuer
     const issuerEntityService = this.app.service('issuerEntity');
     const issuer: IssuerEntity = await issuerEntityService.getDefaultIssuerEntity();
-
-    // // issue credentials
-    // const phoneCredentialSubject = {
-    //   id:
-    // }
-
-    // await issueCredentials(issuer.authToken, issuer.did, did, [emailCredentialSubject], issuer.signingPrivateKey);
 
     return {
       userCode: userEntity.userCode as string,

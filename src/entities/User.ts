@@ -17,7 +17,6 @@ export class UserEntity extends BaseEntity {
   constructor (options: UserEntityOptions) {
     super(options);
 
-    // this.email = options.email;
     this.phone = options.phone;
     this.did = options.did;
     this.firstName = options.firstName;
@@ -25,9 +24,6 @@ export class UserEntity extends BaseEntity {
     this.ssn = options.ssn;
     this.dob = options.dob;
   }
-
-  // @Property({ unique: true })
-  // email: string;
 
   @Property()
   phone: string;

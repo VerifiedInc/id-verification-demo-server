@@ -3,7 +3,6 @@ import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
 
 export const getIssuerEntity: Hook = async (ctx) => {
-// export const handleUserDidAssociation: Hook = async (ctx) => {
   console.log('getIssuerEntity');
   const issuerEntityService = ctx.app.service('issuerEntity');
   let issuerEntity: IssuerEntity;

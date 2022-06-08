@@ -63,21 +63,4 @@ export class IssuerEntity extends BaseEntity {
 
   @Property()
   encryptionKeyId: string;
-
-  // public toDto (): WalletIssuerDto {
-  //   return {
-  //     uuid: this.uuid,
-  //     createdAt: this.createdAt.toISOString(),
-  //     updatedAt: this.updatedAt.toISOString(),
-  //     customerUuid: this.customerUuid,
-  //     issuerUuid: this.issuerUuid,
-  //     did: this.did,
-  //     name: this.name
-  //   };
-  // }
-
-  // public clone (): IssuerEntity {
-  //   const cloned = new IssuerEntity(this);
-  //   return cloned;
-  // }
 }
