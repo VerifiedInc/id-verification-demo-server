@@ -6,7 +6,7 @@ import { JSONObj } from '@unumid/types';
 /**
  * Interface to encapsulate all necessary information for a network request.
  */
- export interface RESTData {
+export interface RESTData {
   method: string;
   baseUrl: string;
   endPoint: string;
@@ -30,7 +30,7 @@ export interface RESTResponse<T = Record<string, unknown>> {
  * Helper to handle network requests.
  * @param inputObj
  */
- export const makeFormDataNetworkRequest = async <T = unknown> (inputObj: RESTData): Promise<RESTResponse<T>> => {
+export const makeFormDataNetworkRequest = async <T = unknown> (inputObj: RESTData): Promise<RESTResponse<T>> => {
   const restHdr: JSONObj = (!inputObj.header ? {} as JSONObj : inputObj.header);
   // Always set the content-type in the header
   restHdr['Content-Type'] = 'application/x-www-form-urlencoded';

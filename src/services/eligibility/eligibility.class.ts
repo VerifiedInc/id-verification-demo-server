@@ -24,22 +24,22 @@ export class EligibilityService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async create (data: any, params?: Params): Promise<ProveServiceResponseV2<EligibilityResponse>> {
-      // const authorization = params?.authentication?.accessToken;
+  async create (data: any, params?: Params): Promise<ProveServiceResponseV2<EligibilityResponse>> {
+    // const authorization = params?.authentication?.accessToken;
 
-      const authService = this.app.service('auth');
-      const authResponse = await authService.create({}, params);
-      const authorization = authResponse['access_token'];
+    const authService = this.app.service('auth');
+    const authResponse = await authService.create({}, params);
+    const authorization = authResponse.access_token;
 
-      const restData: RESTData = {
-        method: 'POST',
-        baseUrl: config.PROVE_SAAS_URL,
-        endPoint: `/identity/eligibility/v2`,
-        header: { Authorization: `Bearer ${authorization}` },
-        data: {
-          "requestId": uuidv4(),
-          "phoneNumber": data.phoneNumber,
-          "minTrustScore": 500
+    const restData: RESTData = {
+      method: 'POST',
+      baseUrl: config.PROVE_SAAS_URL,
+      endPoint: '/identity/eligibility/v2',
+      header: { Authorization: `Bearer ${authorization}` },
+      data: {
+        requestId: uuidv4(),
+        phoneNumber: data.phoneNumber,
+        minTrustScore: 500
       }
     };
 

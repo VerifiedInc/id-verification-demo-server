@@ -69,27 +69,27 @@ export class IdentityService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async create (data: any, params?: Params): Promise<WalletUserDidAssociation<identityResponse>> {
-      // const authorization = params?.authentication?.accessToken;
+  async create (data: any, params?: Params): Promise<WalletUserDidAssociation<identityResponse>> {
+    // const authorization = params?.authentication?.accessToken;
 
-      const authService = this.app.service('auth');
-      const authResponse = await authService.create({}, params);
-      const authorization = authResponse['access_token'];
+    const authService = this.app.service('auth');
+    const authResponse = await authService.create({}, params);
+    const authorization = authResponse.access_token;
 
-      const restData: RESTData = {
-        method: 'POST',
-        baseUrl: config.PROVE_SAAS_URL,
-        endPoint: `/identity/v2`,
-        header: { 
-          Authorization: `Bearer ${authorization}`,
-          "Content-Type": "application/json" 
-        },
-        data: {
-          "requestId": uuidv4(),
-          "phoneNumber": data.phoneNumber,
-          "dob": data.dob,
-          "ssn": data.ssn,
-          "last4": data.last4
+    const restData: RESTData = {
+      method: 'POST',
+      baseUrl: config.PROVE_SAAS_URL,
+      endPoint: '/identity/v2',
+      header: {
+        Authorization: `Bearer ${authorization}`,
+        'Content-Type': 'application/json'
+      },
+      data: {
+        requestId: uuidv4(),
+        phoneNumber: data.phoneNumber,
+        dob: data.dob,
+        ssn: data.ssn,
+        last4: data.last4
       }
     };
 
@@ -106,16 +106,15 @@ export class IdentityService {
 
     const userEntity = await this.userEntityService.create(userEntityOptions, params);
 
-
     // // issue credentials for user
-    
+
     // get issuer
     const issuerEntityService = this.app.service('issuerEntity');
     const issuer: IssuerEntity = await issuerEntityService.getDefaultIssuerEntity();
 
     // // issue credentials
     // const phoneCredentialSubject = {
-    //   id: 
+    //   id:
     // }
 
     // await issueCredentials(issuer.authToken, issuer.did, did, [emailCredentialSubject], issuer.signingPrivateKey);
@@ -124,6 +123,6 @@ export class IdentityService {
       userCode: userEntity.userCode as string,
       issuerDid: issuer.did,
       proveResponse: response.body
-    }
+    };
   }
 }

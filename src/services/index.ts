@@ -12,14 +12,14 @@ import UserEntityService from './userEntity/userEntity.service';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export default function (app: Application): void {
-    app.configure(AuthService);
-    app.configure(UserEntityService);
-    app.configure(UserService);
-    app.configure(GetAuthUrlService);
-    app.configure(GetAuthPathService);
-    app.configure(EligibilityService);
-    app.configure(IdentityService);
-    app.configure(IssuerEntityService);
-    app.configure(IssuerService);
-    app.configure(UserCredentialRequestsService)
+  app.configure(AuthService);
+  app.configure(UserEntityService);
+  app.configure(UserService);
+  app.configure(GetAuthUrlService);
+  app.configure(GetAuthPathService);
+  app.configure(EligibilityService);
+  app.configure(IdentityService);
+  app.configure(IssuerEntityService);
+  app.configure(IssuerService);
+  app.configure(UserCredentialRequestsService);
 }

@@ -65,7 +65,7 @@ export const makeUserDtoFromEntity = (entity: UserEntity): UserDto => {
  * @param where
  * @returns
  */
- async function makeUserDtoFromEntityHook (ctx: HookContext<UserEntity>): Promise<HookVariableContext<'result', UserDto>> {
+async function makeUserDtoFromEntityHook (ctx: HookContext<UserEntity>): Promise<HookVariableContext<'result', UserDto>> {
   // grab the specified user
   const user = makeUserDtoFromEntity(ctx.result as UserEntity);
 
@@ -74,7 +74,6 @@ export const makeUserDtoFromEntity = (entity: UserEntity): UserDto => {
     result: user
   };
 }
-
 
 export const hooks = {
   before: {

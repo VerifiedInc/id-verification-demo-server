@@ -37,7 +37,7 @@ export interface HookVariableContext<K, T> extends FeathersHookContext {
 export interface ProveServiceResponseV1<T> {
     RequestId: string;
     Status: number;
-    Description: "Success";
+    Description: 'Success';
     AdditionalInfo: string;
     Response: T;
 }
@@ -45,7 +45,7 @@ export interface ProveServiceResponseV1<T> {
 export interface ProveServiceResponseV2<T> {
   requestId: string;
   status: number;
-  description: "Success";
+  description: 'Success';
   additionalInfo: string;
   response: T;
 }

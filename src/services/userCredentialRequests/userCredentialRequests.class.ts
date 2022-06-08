@@ -48,7 +48,7 @@ export class UserCredentialRequestsService {
       id: did,
       type: 'DobCredential',
       dob
-    }
+    };
   }
 
   private buildSsnCredentialSubject (did: string, ssn: string): SsnCredentialSubject {
@@ -56,7 +56,7 @@ export class UserCredentialRequestsService {
       id: did,
       type: 'SsnCredential',
       ssn
-    }
+    };
   }
 
   private buildPhoneCredentialSubject (did: string, phone: string): PhoneCredentialSubject {
@@ -64,7 +64,7 @@ export class UserCredentialRequestsService {
       id: did,
       type: 'SsnCredential',
       phone
-    }
+    };
   }
 
   async create (data: UserCredentialRequests, params?: Params): Promise<CredentialsIssuedResponse> {

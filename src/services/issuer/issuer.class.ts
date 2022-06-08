@@ -11,6 +11,7 @@ export interface IssuerDto {
 }
 
 export class IssuerService {
+  /* eslint-disable no-useless-constructor */
   constructor (private app: Application) {}
 
   async create (data: WalletIssuerCreateOptions): Promise<IssuerEntity> {

@@ -1,8 +1,8 @@
-import { issueCredentials, UnumDto } from "@unumid/server-sdk";
-import { CredentialData, CredentialPb } from "@unumid/types";
-import { IssuerEntity } from "../entities/Issuer";
-import logger from "../logger";
-import { formatBearerToken } from "./formatBearerToken";
+import { issueCredentials, UnumDto } from '@unumid/server-sdk';
+import { CredentialData, CredentialPb } from '@unumid/types';
+import { IssuerEntity } from '../entities/Issuer';
+import logger from '../logger';
+import { formatBearerToken } from './formatBearerToken';
 
 export const issueCredentialsHelper = async (
   issuerEntity: IssuerEntity,
