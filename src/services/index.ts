@@ -3,6 +3,7 @@ import AuthService from './auth/auth.service';
 import EligibilityService from './eligibility/eligibility.service';
 import GetAuthPathService from './getAuthPath/getAuthPath.service';
 import GetAuthUrlService from './getAuthUrl/getAuthUrl.service';
+import HyperVergeAuth from './hyperVergeAuth/hyperVergeAuth.service';
 import IdentityService from './identity/identity.service';
 import IssuerService from './issuer/issuer.service';
 import IssuerEntityService from './issuerEntity/issuerEntity.service';
@@ -13,6 +14,7 @@ import UserEntityService from './userEntity/userEntity.service';
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export default function (app: Application): void {
   app.configure(AuthService);
+  app.configure(HyperVergeAuth);
   app.configure(UserEntityService);
   app.configure(UserService);
   app.configure(GetAuthUrlService);
