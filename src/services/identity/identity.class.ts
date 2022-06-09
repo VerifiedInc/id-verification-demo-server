@@ -10,6 +10,7 @@ import { issueCredentials } from '@unumid/server-sdk';
 import { CredentialData } from '@unumid/types';
 import { UserEntityOptions } from '../../entities/User';
 import { UserEntityService } from '../userEntity/userEntity.class';
+import { maskString } from '../../utils/maskString';
 
 interface phoneCredentialSubject extends CredentialData {
   id: string;
@@ -97,7 +98,7 @@ export class IdentityService {
     // need to store the data until the user has a did to issue credentials to
     const userEntityOptions: UserEntityOptions = {
       dob: identityData.individual.dob,
-      ssn: identityData.individual.ssn,
+      ssn: maskString(identityData.individual.ssn, 4),
       phone: identityData.phoneNumber,
       userCode: v4()
     };
