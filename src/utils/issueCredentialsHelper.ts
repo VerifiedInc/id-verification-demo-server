@@ -4,6 +4,21 @@ import { IssuerEntity } from '../entities/Issuer';
 import logger from '../logger';
 import { formatBearerToken } from './formatBearerToken';
 
+export interface PhoneCredentialSubject extends CredentialData{
+  id: string;
+  phone: string;
+}
+
+export interface DobCredentialSubject extends CredentialData{
+  id: string;
+  dob: string;
+}
+
+export interface SsnCredentialSubject extends CredentialData{
+  id: string;
+  ssn: string;
+}
+
 export const issueCredentialsHelper = async (
   issuerEntity: IssuerEntity,
   credentialSubject: string,
@@ -26,3 +41,27 @@ export const issueCredentialsHelper = async (
     throw e;
   }
 };
+
+export function buildDobCredentialSubject (did: string, dob: string): DobCredentialSubject {
+  return {
+    id: did,
+    type: 'DobCredential',
+    dob
+  };
+}
+
+export function buildSsnCredentialSubject (did: string, ssn: string): SsnCredentialSubject {
+  return {
+    id: did,
+    type: 'SsnCredential',
+    ssn
+  };
+}
+
+export function buildPhoneCredentialSubject (did: string, phone: string): PhoneCredentialSubject {
+  return {
+    id: did,
+    type: 'PhoneCredential',
+    phone
+  };
+}

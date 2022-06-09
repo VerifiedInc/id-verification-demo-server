@@ -21,16 +21,15 @@ export class HyperVergeAuth {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create (data: any, params?: Params): Promise<HyperVergeAuthToken> {
-
     const restData: RESTData = {
       method: 'POST',
       baseUrl: config.HYPER_VERGE_SAAS_URL,
       endPoint: '/login',
       header: { },
       data: {
-        "appId": config.HYPER_VERGE_APP_ID,
-        "appKey": config.HYPER_VERGE_APP_KEY,
-        "expiry": 30000
+        appId: config.HYPER_VERGE_APP_ID,
+        appKey: config.HYPER_VERGE_APP_KEY,
+        expiry: 30000
       }
     };
 

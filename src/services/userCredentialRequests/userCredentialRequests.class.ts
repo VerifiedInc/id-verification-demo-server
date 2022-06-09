@@ -6,22 +6,7 @@ import { CredentialRequest } from '@unumid/types/build/protos/credential';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
 import { UserDto } from '../user/user.class';
-import { issueCredentialsHelper } from '../../utils/issueCredentialsHelper';
-
-interface PhoneCredentialSubject extends CredentialData{
-  id: string;
-  phone: string;
-}
-
-interface DobCredentialSubject extends CredentialData{
-  id: string;
-  dob: string;
-}
-
-interface SsnCredentialSubject extends CredentialData{
-  id: string;
-  ssn: string;
-}
+import { buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, DobCredentialSubject, issueCredentialsHelper, PhoneCredentialSubject, SsnCredentialSubject } from '../../utils/issueCredentialsHelper';
 
 export type ValidCredentialTypes = PhoneCredentialSubject | SsnCredentialSubject | DobCredentialSubject;
 
@@ -41,30 +26,6 @@ export class UserCredentialRequestsService {
 
   constructor (app: Application) {
     this.app = app;
-  }
-
-  private buildDobCredentialSubject (did: string, dob: string): DobCredentialSubject {
-    return {
-      id: did,
-      type: 'DobCredential',
-      dob
-    };
-  }
-
-  private buildSsnCredentialSubject (did: string, ssn: string): SsnCredentialSubject {
-    return {
-      id: did,
-      type: 'SsnCredential',
-      ssn
-    };
-  }
-
-  private buildPhoneCredentialSubject (did: string, phone: string): PhoneCredentialSubject {
-    return {
-      id: did,
-      type: 'SsnCredential',
-      phone
-    };
   }
 
   async create (data: UserCredentialRequests, params?: Params): Promise<CredentialsIssuedResponse> {
@@ -107,21 +68,21 @@ export class UserCredentialRequestsService {
     const credentialSubjects: ValidCredentialTypes[] = [];
     subjectCredentialRequests.credentialRequests.forEach((credentialRequest: CredentialRequest) => {
       if (credentialRequest.type === 'DobCredential') {
-        credentialSubjects.push(this.buildDobCredentialSubject(userDid, user.dob));
+        credentialSubjects.push(buildDobCredentialSubject(userDid, user.dob));
       } else if (credentialRequest.type === 'SsnCredential') {
-        credentialSubjects.push(this.buildSsnCredentialSubject(userDid, user.ssn));
+        credentialSubjects.push(buildSsnCredentialSubject(userDid, user.ssn));
       } else if (credentialRequest.type === 'PhoneCredential') {
-        credentialSubjects.push(this.buildPhoneCredentialSubject(userDid, user.phone));
+        credentialSubjects.push(buildPhoneCredentialSubject(userDid, user.phone));
       }
     });
 
-    const issuerDto: UnumDto<CredentialPb[]> = await issueCredentialsHelper(issuer, userDid, credentialSubjects);
+    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(issuer, userDid, credentialSubjects);
 
     // update the default issuer's auth token if it has been reissued
-    if (issuerDto.authToken !== issuer.authToken) {
+    if (unumDtoCredentialsIssuedResponse.authToken !== issuer.authToken) {
       const userEntityService = this.app.service('issuerEntity');
       try {
-        await userEntityService.patch(issuer.uuid, { authToken: issuerDto.authToken });
+        await userEntityService.patch(issuer.uuid, { authToken: unumDtoCredentialsIssuedResponse.authToken });
       } catch (e) {
         logger.error('CredentialRequest create caught an error thrown by userEntityService.patch', e);
         throw e;
