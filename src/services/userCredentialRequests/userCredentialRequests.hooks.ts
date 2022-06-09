@@ -32,5 +32,7 @@ export const hooks = {
   before: {
     create: [getIssuerEntity, validateUserCredentialRequest, handleUserDidAssociation]
   },
-  after: {}
+  after: {
+    create: []
+  }
 };

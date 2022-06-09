@@ -1,9 +1,10 @@
 import { BadRequest } from '@feathersjs/errors';
 import { Hook } from '@feathersjs/feathers';
-import { revokeAllCredentials, UnumDto, VerifiedStatus, verifySignedDid } from '@unumid/server-sdk';
-import { SubjectCredentialRequestsDto, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
+import { issueCredentials, revokeAllCredentials, UnumDto, VerifiedStatus, verifySignedDid } from '@unumid/server-sdk';
+import { CredentialPb, SubjectCredentialRequestsDto, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
+import { issueUserCredentials } from '../../utils/issueUserCredentials';
 import { UserDto } from '../user/user.class';
 
 /**
@@ -67,15 +68,29 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
 
   const userDid = did.id;
 
-  // if this is a new did association for the user then we need to revoke all the credentials associated with teh old did document
+  // if this is a new DID association for the user then we need to revoke all the credentials associated with teh old did document
   if (userDid !== user.did) {
     if (user.did) {
       // revoke all credentials associated with old did
       await revokeAllCredentials(issuer.authToken, issuer.did, issuer.signingPrivateKey, user.did);
     }
 
-    // update the user with the new did
+    // update the user with the new DID
     user = await userEntityService.patch(user.uuid, { did: userDid, userCode: null });
+
+    // now that the user has a DID we can issue credentials for the user
+    const issuedCredentialDto: UnumDto<CredentialPb[]> = await issueUserCredentials(user, issuer);
+
+    // update the default issuer's auth token if it has been reissued
+    if (issuedCredentialDto.authToken !== issuer.authToken) {
+      const userEntityService = ctx.app.service('issuerEntity');
+      try {
+        await userEntityService.patch(issuer.uuid, { authToken: issuedCredentialDto.authToken });
+      } catch (e) {
+        logger.error('CredentialRequest create caught an error thrown by userEntityService.patch', e);
+        throw e;
+      }
+    }
   } else {
     logger.debug('User association information sent with identical user did information.');
     user = await userEntityService.patch(user.uuid, { userCode: null }); // remove the userCode from the user
