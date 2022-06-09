@@ -14,6 +14,7 @@ interface Config {
   DB_USER: string;
   DB_PASSWORD: string;
   SAAS_CLIENT_URL: string;
+  FRONTEND_URL: string;
   PROVE_SAAS_URL: string;
   PROVE_USERNAME: string;
   PROVE_PASSWORD: string;
@@ -36,12 +37,13 @@ const {
   DB_USER = '',
   DB_PASSWORD = '',
   SAAS_CLIENT_URL = '',
+  FRONTEND_URL = '',
   PROVE_SAAS_URL = '',
   PROVE_USERNAME = '',
   PROVE_PASSWORD = '',
   PROVE_CLIENT_ID = '',
   HYPER_VERGE_SAAS_URL = '',
-  HYPER_VERGE_APP_ID= '',
+  HYPER_VERGE_APP_ID = '',
   HYPER_VERGE_APP_KEY = '',
   FROM_NUMBER = '',
   ACCOUNT_SID = '',
@@ -74,6 +76,7 @@ export const config: Config = {
   LOG_LEVEL,
   ADMIN_AUTH_KEY,
   SAAS_CLIENT_URL,
+  FRONTEND_URL,
   PROVE_SAAS_URL,
   PROVE_USERNAME,
   PROVE_PASSWORD,

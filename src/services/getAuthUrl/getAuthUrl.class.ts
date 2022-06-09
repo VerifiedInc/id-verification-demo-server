@@ -24,6 +24,8 @@ export class GetAuthUrlService {
   async create (data: any, params?: Params): Promise<ProveServiceResponseV1<AuthUrlResponse>> {
     const authorization = data.authorization;
 
+    // logger.debug(`fe url: ${config.FRONTEND_URL}`);
+
     const restData: RESTData = {
       method: 'POST',
       baseUrl: config.PROVE_SAAS_URL,
@@ -34,7 +36,7 @@ export class GetAuthUrlService {
         SessionId: 'SubmittedSessionId', // TODO
         ApiClientId: config.PROVE_CLIENT_ID,
         SourceIp: '127.0.0.1', // TODO
-        FinalTargetUrl: data.finalTargetUrl,
+        FinalTargetUrl: config.FRONTEND_URL,
         MobileNumber: data.mobileNumber
       }
     };
