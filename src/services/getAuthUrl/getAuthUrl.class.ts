@@ -36,7 +36,7 @@ export class GetAuthUrlService {
         SessionId: 'SubmittedSessionId', // TODO
         ApiClientId: config.PROVE_CLIENT_ID,
         SourceIp: '127.0.0.1', // TODO
-        FinalTargetUrl: config.FRONTEND_URL,
+        FinalTargetUrl: `${config.FRONTEND_URL}?dob=${data.dob}`,
         MobileNumber: data.mobileNumber
       }
     };

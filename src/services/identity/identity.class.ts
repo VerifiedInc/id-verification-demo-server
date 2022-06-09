@@ -70,7 +70,6 @@ export class IdentityService {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create (data: any, params?: Params): Promise<WalletUserDidAssociation<identityResponse>> {
-    
     const authService = this.app.service('auth');
     const authResponse = await authService.create({}, params);
     const authorization = authResponse.access_token;
