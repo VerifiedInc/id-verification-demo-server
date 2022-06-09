@@ -11,5 +11,5 @@ import logger from '../logger';
  * @returns
  */
 export function maskString (ssn: string, numOfDigits: number): string {
-  return ssn.slice(0, -numOfDigits).replace(/./g, '#') + ssn.slice(-numOfDigits);
+  return ssn ? ssn.slice(0, -numOfDigits).replace(/./g, '#') + ssn.slice(-numOfDigits) : '';
 }
