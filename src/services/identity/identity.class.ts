@@ -98,7 +98,7 @@ export class IdentityService {
     // need to store the data until the user has a did to issue credentials to
     const userEntityOptions: UserEntityOptions = {
       dob: identityData.individual.dob,
-      ssn: maskString(identityData.individual.ssn, 4),
+      ssn: maskString(identityData.individual.ssn, 2),
       phone: identityData.phoneNumber,
       userCode: v4()
     };
