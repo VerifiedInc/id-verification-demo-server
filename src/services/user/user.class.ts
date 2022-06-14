@@ -16,8 +16,8 @@ export interface UserDto {
   did?: string;
   userCode?: string;
   phone: string;
-  dob: string,
-  ssn: string,
+  dob?: string,
+  ssn?: string,
 }
 
 export class UserService {

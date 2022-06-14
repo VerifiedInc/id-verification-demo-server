@@ -67,9 +67,9 @@ export class UserCredentialRequestsService {
      */
     const credentialSubjects: ValidCredentialTypes[] = [];
     subjectCredentialRequests.credentialRequests.forEach((credentialRequest: CredentialRequest) => {
-      if (credentialRequest.type === 'DobCredential') {
+      if (credentialRequest.type === 'DobCredential' && user.dob) {
         credentialSubjects.push(buildDobCredentialSubject(userDid, user.dob));
-      } else if (credentialRequest.type === 'SsnCredential') {
+      } else if (credentialRequest.type === 'SsnCredential' && user.ssn) {
         credentialSubjects.push(buildSsnCredentialSubject(userDid, user.ssn));
       } else if (credentialRequest.type === 'PhoneCredential') {
         credentialSubjects.push(buildPhoneCredentialSubject(userDid, user.phone));

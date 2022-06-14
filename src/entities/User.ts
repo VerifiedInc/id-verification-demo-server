@@ -8,8 +8,8 @@ export interface UserEntityOptions extends BaseEntityOptions {
   firstName?: string;
   did?: string;
   userCode?: string;
-  ssn: string;
-  dob: string;
+  ssn?: string;
+  dob?: string;
 }
 
 @Entity({ tableName: 'User' })
@@ -29,10 +29,10 @@ export class UserEntity extends BaseEntity {
   phone: string;
 
   @Property()
-  dob: string;
+  dob?: string;
 
   @Property()
-  ssn: string;
+  ssn?: string;
 
   @Property()
   did?: string;
