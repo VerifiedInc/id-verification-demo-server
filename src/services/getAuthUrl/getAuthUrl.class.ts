@@ -44,7 +44,7 @@ export class GetAuthUrlService {
     const response = await makeNetworkRequest<ProveServiceResponseV1<AuthUrlResponse>>(restData);
 
     // send sms to mobile number
-    const result = await sendSms(data.mobileNumber, response.body.Response.AuthenticationUrl);
+    const result = await sendSms(data.mobileNumber, `Please click the url to verify your phone number ${response.body.Response.AuthenticationUrl}.`);
 
     return response.body;
   }
