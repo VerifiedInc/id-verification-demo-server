@@ -113,7 +113,7 @@ jobs:
       - run:
           name: Deploy container image, << parameters.image_tag >>
           command: |
-            kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:<< parameters.image_tag >>
+            kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:<< parameters.image_tag >> -n << parameters.namespace >>
 
             # Check deployment rollout status every 10 seconds (max 10 minutes) until complete.
             # ref: https://www.jeffgeerling.com/blog/2018/updating-kubernetes-deployment-and-waiting-it-roll-out-shell-script
