@@ -53,7 +53,9 @@ jobs:
       reg:
         type: string
         default: "248606629437.dkr.ecr.us-west-2.amazonaws.com"
-      tag:
+      image_tag_1:
+        type: string
+      image_tag_2:
         type: string
       repo:
         type: string
@@ -67,13 +69,16 @@ jobs:
           command: |
             echo Logging in to Amazon ECR...
             $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+
             echo Building the Docker image...
             DOCKER_BUILDKIT=1 docker build --ssh github="$HOME/.ssh/id_rsa" -t ${CIRCLE_SHA1} .
-            docker tag ${CIRCLE_SHA1} << parameters.reg >>/<< parameters.repo >>:<< parameters.tag >>
-            docker tag ${CIRCLE_SHA1} << parameters.reg >>/<< parameters.repo >>:"${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
+            
+            docker tag ${CIRCLE_SHA1} << parameters.reg >>/<< parameters.repo >>:<< parameters.image_tag_1 >>
+            docker tag ${CIRCLE_SHA1} << parameters.reg >>/<< parameters.repo >>:<< parameters.image_tag_2 >>
+            
             echo Pushing the Docker image...
-            docker push << parameters.reg >>/<< parameters.repo >>:"${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
-            docker push << parameters.reg >>/<< parameters.repo >>:<< parameters.tag >>
+            docker push << parameters.reg >>/<< parameters.repo >>:<< parameters.image_tag_1 >>
+            docker push << parameters.reg >>/<< parameters.repo >>:<< parameters.image_tag_2 >>
       - slack/notify:
           event: fail
           mentions: '@devops-team'
@@ -90,7 +95,7 @@ jobs:
         type: string
       deployment:
         type: string
-      tag:
+      image_tag:
         type: string
       slack_pass_notify_template:
         type: string
@@ -102,9 +107,9 @@ jobs:
           aws-region: ${AWS_REGION}
           cluster-name: << parameters.cluster-name >>
       - run:
-          name: Deploy container image, << parameters.tag >>
+          name: Deploy container image, << parameters.image_tag >>
           command: |
-            kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:<< parameters.tag >>
+            kubectl set image deployment/<< parameters.deployment >> << parameters.deployment >>=${AWS_ECR_URL}/<< parameters.repo >>:<< parameters.image_tag >>
 
             # Check deployment rollout status every 10 seconds (max 10 minutes) until complete.
             # ref: https://www.jeffgeerling.com/blog/2018/updating-kubernetes-deployment-and-waiting-it-roll-out-shell-script
@@ -149,7 +154,8 @@ workflows:
             - AWS-Dev
             - Slack-Context
           repo: id-verification-demo-server
-          tag: dev-latest
+          image_tag_1: dev-latest
+          image_tag_2: "${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
           filters:
             branches:
               only:
@@ -165,7 +171,7 @@ workflows:
           repo: id-verification-demo-server
           deployment: id-verification-demo-server
           cluster-name: "dev-customer-cluster"
-          tag: "${CIRCLE_BRANCH}-${CIRCLE_PREVIOUS_BUILD_NUM}"
+          image_tag: "${CIRCLE_BRANCH}-${CIRCLE_PREVIOUS_BUILD_NUM}"
           filters:
             branches:
               only:
@@ -189,7 +195,8 @@ workflows:
             - AWS-Dev
             - Slack-Context
           repo: id-verification-demo-server
-          tag: sandbox-latest
+          image_tag_1: sandbox-latest
+          image_tag_2: "${CIRCLE_TAG}"
           filters:
             tags:
               only: /^v.*/
@@ -206,7 +213,7 @@ workflows:
           repo: id-verification-demo-server
           deployment: id-verification-demo-server
           cluster-name: "sandbox-customer-cluster"
-          tag: "${CIRCLE_TAG}"
+          image_tag: "${CIRCLE_TAG}"
           slack_pass_notify_template: success_tagged_deploy_1
           filters:
             tags:
