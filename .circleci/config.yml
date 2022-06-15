@@ -100,6 +100,10 @@ jobs:
       slack_pass_notify_template:
         type: string
         default: basic_success_1
+      namespace:
+        type: string
+        default: "default"
+
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
@@ -114,7 +118,7 @@ jobs:
             # Check deployment rollout status every 10 seconds (max 10 minutes) until complete.
             # ref: https://www.jeffgeerling.com/blog/2018/updating-kubernetes-deployment-and-waiting-it-roll-out-shell-script
             ATTEMPTS=0
-            ROLLOUT_STATUS_CMD="kubectl rollout status deployment/<< parameters.deployment >>"
+            ROLLOUT_STATUS_CMD="kubectl rollout status deployment/<< parameters.deployment >> -n << parameters.namespace >>"
             until $ROLLOUT_STATUS_CMD || [ $ATTEMPTS -eq 60 ]; do
               $ROLLOUT_STATUS_CMD
               ATTEMPTS=$((attempts + 1))
@@ -214,6 +218,7 @@ workflows:
           deployment: id-verification-demo-server
           cluster-name: "sandbox-customer-cluster"
           image_tag: "${CIRCLE_TAG}"
+          namespace: demos
           slack_pass_notify_template: success_tagged_deploy_1
           filters:
             tags:
