@@ -5,21 +5,21 @@ import logger from '../../logger';
 export const getIssuerEntities: Hook = async (ctx) => {
   console.log('getIssuerEntities');
   const issuerEntityService = ctx.app.service('issuerEntity');
-  let proveIssuerEntity: IssuerEntity, hwIssuerEntity: IssuerEntity;
+  let proveIssuerEntity: IssuerEntity, hvIssuerEntity: IssuerEntity;
 
   try {
     proveIssuerEntity = await issuerEntityService.getProveIssuerEntity();
     logger.info('proveIssuerEntity', proveIssuerEntity);
 
-    hwIssuerEntity = await issuerEntityService.getHVIssuerEntity();
-    logger.info('hwIssuerEntity', hwIssuerEntity);
+    hvIssuerEntity = await issuerEntityService.getHyperVergeIssuerEntity();
+    logger.info('hwIssuerEntity', hvIssuerEntity);
 
     return {
       ...ctx,
       params: {
         ...ctx.params,
         proveIssuerEntity,
-        hwIssuerEntity
+        hvIssuerEntity
       }
 
     };

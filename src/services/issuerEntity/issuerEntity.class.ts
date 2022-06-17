@@ -27,7 +27,7 @@ export class IssuerEntityService extends MikroOrmService<IssuerEntity> {
       }) as IssuerEntity[];
       return defaultIssuerEntity[0];
     } catch (e) {
-      logger.error('IssuerEntityService.getHVIssuerEntity caught an error thrown by this.find', e);
+      logger.error('IssuerEntityService.getHyperVergeIssuerEntity caught an error thrown by this.find', e);
       throw e;
     }
   }

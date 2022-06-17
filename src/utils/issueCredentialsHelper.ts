@@ -1,5 +1,5 @@
 import { issueCredentials, UnumDto } from '@unumid/server-sdk';
-import { CredentialData, CredentialPb } from '@unumid/types';
+import { CredentialData, CredentialPb, CredentialSubject } from '@unumid/types';
 import { IssuerEntity } from '../entities/Issuer';
 import logger from '../logger';
 import { formatBearerToken } from './formatBearerToken';
@@ -99,8 +99,17 @@ export function buildFirstNameCredentialSubject (did: string, firstName: string)
   };
 }
 
-export function buildAtomicCredentialSubject (did: string, type: string, key: string, value: string): CredentialData {
+export function buildAtomicCredentialData (type: string, key: string, value: string): CredentialData {
   const subject: CredentialData = {
+    type
+  };
+
+  subject[key] = value;
+  return subject;
+}
+
+export function buildAtomicCredentialSubject (did: string, type: string, key: string, value: string): CredentialSubject {
+  const subject: CredentialSubject = {
     id: did,
     type
   };

@@ -67,12 +67,12 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
   // verify the subject did document; issuer.did is strictly for receipt / audit log entry creation
   const result: UnumDto<VerifiedStatus> = await verifySignedDid(proveIssuerEntity.authToken, proveIssuerEntity.did, did);
 
-  if (!result.body.isVerified) {
-    throw new Error(`${result.body.message} Subject DID document ${did.id} for user ${userCode} is not verified.`);
-  }
+  // if (!result.body.isVerified) {
+  //   throw new Error(`${result.body.message} Subject DID document ${did.id} for user ${userCode} is not verified.`);
+  // } // TODO DO NOT COMMIT
 
   // update the proveIssuerEntity issuer's auth token if it has been reissued
-  if (result.authToken !== hvIssuerEntity.authToken) {
+  if (result.authToken !== proveIssuerEntity.authToken) {
     const issuerEntityService = app.service('issuerEntity');
     try {
       await issuerEntityService.patch(hvIssuerEntity.uuid, { authToken: result.authToken });
@@ -113,10 +113,10 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     const hvIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueHvUserCredentials(user, hvIssuerEntity);
 
     // update the hv issuer's auth token if it has been reissued
-    if (proveIssuedCredentialDto.authToken !== proveIssuerEntity.authToken) {
+    if (hvIssuedCredentialDto.authToken !== hvIssuerEntity.authToken) {
       const userEntityService = ctx.app.service('issuerEntity');
       try {
-        await userEntityService.patch(proveIssuerEntity.uuid, { authToken: proveIssuedCredentialDto.authToken });
+        await userEntityService.patch(hvIssuerEntity.uuid, { authToken: hvIssuedCredentialDto.authToken });
       } catch (e) {
         logger.error('CredentialRequest create caught an error thrown by userEntityService.patch', e);
         throw e;

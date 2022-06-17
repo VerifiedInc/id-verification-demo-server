@@ -6,7 +6,7 @@ import { CredentialRequest } from '@unumid/types/build/protos/credential';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
 import { UserDto } from '../user/user.class';
-import { buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, DobCredentialSubject, issueCredentialsHelper, PhoneCredentialSubject, SsnCredentialSubject } from '../../utils/issueCredentialsHelper';
+import { buildAtomicCredentialData, buildAtomicCredentialSubject, buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, DobCredentialSubject, issueCredentialsHelper, PhoneCredentialSubject, SsnCredentialSubject } from '../../utils/issueCredentialsHelper';
 
 export type ValidCredentialTypes = PhoneCredentialSubject | SsnCredentialSubject | DobCredentialSubject;
 
@@ -28,12 +28,8 @@ export class UserCredentialRequestsService {
     this.app = app;
   }
 
-  async create (data: UserCredentialRequests, params?: Params): Promise<CredentialsIssuedResponse> {
-    const issuer: IssuerEntity = params?.issuerEntity;
-
-    if (!issuer) {
-      throw new Error('No issuer entity found in params. This should never happen after the before hook grabbing the issuer entity.');
-    }
+  private async handleProveCredentials (data: UserCredentialRequests, params?: Params): Promise<CredentialsIssuedResponse> {
+    const proveIssuer: IssuerEntity = params?.proveIssuerEntity;
 
     if (!data.credentialRequestsInfo) {
       // short circuit as no requests for credentials
@@ -44,18 +40,18 @@ export class UserCredentialRequestsService {
 
     const { user, credentialRequestsInfo: { subjectCredentialRequests, issuerDid, subjectDid } } = data;
 
-    if (issuer.did !== issuerDid) {
-      throw new Error(`Persisted Issuer DID ${issuer.did} does not match request's issuer did ${issuerDid}`);
+    if (proveIssuer.did !== issuerDid) {
+      throw new Error(`Persisted Issuer DID ${proveIssuer.did} does not match request's issuer did ${issuerDid}`);
     }
 
-    const verification: UnumDto<VerifiedStatus> = await verifySubjectCredentialRequests(issuer.authToken, issuer.did, subjectDid, subjectCredentialRequests);
+    const verification: UnumDto<VerifiedStatus> = await verifySubjectCredentialRequests(proveIssuer.authToken, proveIssuer.did, subjectDid, subjectCredentialRequests);
 
     if (!verification.body.isVerified) {
       logger.error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
       throw new Error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
     }
 
-    // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
+    // Note in the userDidAssociation hook we have already ensured that the user has an associated did. However, doing here as well to appease compile time type checking.
     const userDid = user.did as string;
 
     /**
@@ -65,7 +61,7 @@ export class UserCredentialRequestsService {
      *
      * For demonstration purposes just simply full-filling email, kyc and auth credential requests.
      */
-    const credentialSubjects: ValidCredentialTypes[] = [];
+    const credentialSubjects: CredentialData[] = [];
     subjectCredentialRequests.credentialRequests.forEach((credentialRequest: CredentialRequest) => {
       if (credentialRequest.type === 'DobCredential' && user.proveDob) {
         credentialSubjects.push(buildDobCredentialSubject(userDid, user.proveDob));
@@ -73,16 +69,29 @@ export class UserCredentialRequestsService {
         credentialSubjects.push(buildSsnCredentialSubject(userDid, user.proveSsn));
       } else if (credentialRequest.type === 'PhoneCredential') {
         credentialSubjects.push(buildPhoneCredentialSubject(userDid, user.provePhone));
+      } else if (credentialRequest.type === 'FirstNameCredential' && user.proveFirstName) {
+        credentialSubjects.push({
+          type: 'LastNameCredential',
+          firstName: user.proveFirstName
+        });
+      } else if (credentialRequest.type === 'LastNameCredential' && user.proveLastName) {
+        // credentialSubjects.push({
+        //   id: userDid,
+        //   type: 'LastNameCredential',
+        //   lastName: user.proveLastName
+        // });
+        // credentialSubjects.push(buildAtomicCredentialData('LastNameCredential', 'lastName', user.proveLastName));
+        credentialSubjects.push({ type: 'LastNameCredential', lastName: user.proveLastName });
       }
     });
 
-    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(issuer, userDid, credentialSubjects);
+    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(proveIssuer, userDid, credentialSubjects);
 
     // update the default issuer's auth token if it has been reissued
-    if (unumDtoCredentialsIssuedResponse.authToken !== issuer.authToken) {
-      const userEntityService = this.app.service('issuerEntity');
+    if (unumDtoCredentialsIssuedResponse.authToken !== proveIssuer.authToken) {
+      const issuerEntityService = this.app.service('issuerEntity');
       try {
-        await userEntityService.patch(issuer.uuid, { authToken: unumDtoCredentialsIssuedResponse.authToken });
+        await issuerEntityService.patch(proveIssuer.uuid, { authToken: unumDtoCredentialsIssuedResponse.authToken });
       } catch (e) {
         logger.error('CredentialRequest create caught an error thrown by userEntityService.patch', e);
         throw e;
@@ -90,7 +99,85 @@ export class UserCredentialRequestsService {
     }
 
     return {
-      credentialTypesIssued: credentialSubjects.map((credentialSubject: ValidCredentialTypes) => credentialSubject.type)
+      credentialTypesIssued: credentialSubjects.map((credentialSubject: CredentialData) => credentialSubject.type)
+    };
+  }
+
+  private async handleHvCredentials (data: UserCredentialRequests, params?: Params): Promise<CredentialsIssuedResponse> {
+    const hvIssuer: IssuerEntity = params?.hvIssuerEntity;
+
+    if (!data.credentialRequestsInfo) {
+      // short circuit as no requests for credentials
+      return {
+        credentialTypesIssued: []
+      };
+    }
+
+    const { user, credentialRequestsInfo: { subjectCredentialRequests, issuerDid, subjectDid } } = data;
+
+    if (hvIssuer.did !== issuerDid) {
+      throw new Error(`Persisted Issuer DID ${hvIssuer.did} does not match request's issuer did ${issuerDid}`);
+    }
+
+    const verification: UnumDto<VerifiedStatus> = await verifySubjectCredentialRequests(hvIssuer.authToken, hvIssuer.did, subjectDid, subjectCredentialRequests);
+
+    if (!verification.body.isVerified) {
+      logger.error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
+      throw new Error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
+    }
+
+    // Note in the userDidAssociation hook we have already ensured that the user has an associated did. However, doing here as well to appease compile time type checking.
+    const userDid = user.did as string;
+
+    /**
+     * Now that we have verified the credential requests signature signed by the subject, aka user, and we
+     * have confirmed to have a user with the matching did in our data store, we need some logic to determine if we can
+     * issue the requested credentials.
+     *
+     * For demonstration purposes just simply full-filling email, kyc and auth credential requests.
+     */
+    const credentialSubjects: CredentialData[] = [];
+    subjectCredentialRequests.credentialRequests.forEach((credentialRequest: CredentialRequest) => {
+      if (credentialRequest.type === 'DobCredential' && user.hvDob) {
+        credentialSubjects.push(buildDobCredentialSubject(userDid, user.hvDob));
+      } else if (credentialRequest.type === 'GenderCredential' && user.hvGender) {
+        credentialSubjects.push({ type: 'GenderCredential', gender: user.hvGender });
+      } else if (credentialRequest.type === 'FullNameCredential' && user.hvFullName) {
+        credentialSubjects.push({ type: 'FullNameCredential', fullName: user.hvFullName });
+      } else if (credentialRequest.type === 'AddressCredential' && user.hvAddress) {
+        credentialSubjects.push({
+          type: 'AddressCredential',
+          address: user.hvAddress
+        });
+      }
+    });
+
+    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, userDid, credentialSubjects);
+
+    // update the default issuer's auth token if it has been reissued
+    if (unumDtoCredentialsIssuedResponse.authToken !== hvIssuer.authToken) {
+      const issuerEntityService = this.app.service('issuerEntity');
+      try {
+        await issuerEntityService.patch(hvIssuer.uuid, { authToken: unumDtoCredentialsIssuedResponse.authToken });
+      } catch (e) {
+        logger.error('CredentialRequest create caught an error thrown by userEntityService.patch', e);
+        throw e;
+      }
+    }
+
+    return {
+      credentialTypesIssued: credentialSubjects.map((credentialSubject: CredentialData) => credentialSubject.type)
+    };
+  }
+
+  async create (data: UserCredentialRequests, params?: Params): Promise<CredentialsIssuedResponse> {
+    const proveResult = await this.handleProveCredentials(data, params);
+    const hvResult = await this.handleHvCredentials(data, params);
+
+    const result = proveResult.credentialTypesIssued.concat(hvResult.credentialTypesIssued);
+
+    return {
+      credentialTypesIssued: result
     };
   }
 }
