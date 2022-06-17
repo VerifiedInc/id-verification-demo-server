@@ -8,7 +8,7 @@ import { buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredent
 
 // Handle issuing Prove credentials
 export async function issueProveUserCredentials (user: UserDto, proveIssuer: IssuerEntity): Promise<UnumDto<CredentialPb[]>> {
-  const credentialSubjects: CredentialSubject[] = [];
+  const credentialSubjects: CredentialData[] = [];
 
   if (!user.did) {
     logger.error('User did not have a did. This should never happen.');
@@ -30,6 +30,7 @@ export async function issueProveUserCredentials (user: UserDto, proveIssuer: Iss
   if (user.proveFirstName) {
     credentialSubjects.push({
       id: user.did,
+      type: 'FirstNameCredential',
       firstName: user.proveFirstName
     });
   }
@@ -37,6 +38,7 @@ export async function issueProveUserCredentials (user: UserDto, proveIssuer: Iss
   if (user.proveLastName) {
     credentialSubjects.push({
       id: user.did,
+      type: 'LastNameCredential',
       lastName: user.proveLastName
     });
   }
@@ -49,7 +51,7 @@ export async function issueProveUserCredentials (user: UserDto, proveIssuer: Iss
 // Handle issuing Prove credentials
 export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEntity): Promise<UnumDto<CredentialPb[]>> {
   // const credentialSubjects: ValidCredentialTypes[] = [];
-  const credentialSubjects: CredentialSubject[] = [];
+  const credentialSubjects: CredentialData[] = [];
 
   if (!user.did) {
     logger.error('User did not have a did. This should never happen.');
@@ -63,6 +65,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
   if (user.hvGender) {
     credentialSubjects.push({
       id: user.did,
+      type: 'genderCredential',
       gender: user.hvGender
     });
   }
@@ -70,6 +73,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
   if (user.hvFullName) {
     credentialSubjects.push({
       id: user.did,
+      type: 'FullNameCredential',
       fullName: user.hvFullName
     });
   }
@@ -77,6 +81,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
   if (user.hvAddress) {
     credentialSubjects.push({
       id: user.did,
+      type: 'AddressCredential',
       address: user.hvAddress
     });
   }
