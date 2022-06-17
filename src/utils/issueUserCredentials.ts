@@ -8,18 +8,37 @@ import { buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredent
 
 // Handle issuing Prove credentials
 export async function issueProveUserCredentials (user: UserDto, proveIssuer: IssuerEntity): Promise<UnumDto<CredentialPb[]>> {
-  const credentialSubjects: ValidCredentialTypes[] = [];
+  const credentialSubjects: CredentialSubject[] = [];
 
-  if (user.dob) {
-    credentialSubjects.push(buildDobCredentialSubject(user.did as string, user.dob));
+  if (!user.did) {
+    logger.error('User did not have a did. This should never happen.');
+    throw new Error('User did not have a did');
   }
 
-  if (user.ssn) {
-    credentialSubjects.push(buildSsnCredentialSubject(user.did as string, user.ssn));
+  if (user.proveDob) {
+    credentialSubjects.push(buildDobCredentialSubject(user.did as string, user.proveDob));
   }
 
-  if (user.phone) {
-    credentialSubjects.push(buildPhoneCredentialSubject(user.did as string, user.phone));
+  if (user.proveSsn) {
+    credentialSubjects.push(buildSsnCredentialSubject(user.did as string, user.proveSsn));
+  }
+
+  if (user.provePhone) {
+    credentialSubjects.push(buildPhoneCredentialSubject(user.did as string, user.provePhone));
+  }
+
+  if (user.proveFirstName) {
+    credentialSubjects.push({
+      id: user.did,
+      firstName: user.proveFirstName
+    });
+  }
+
+  if (user.proveLastName) {
+    credentialSubjects.push({
+      id: user.did,
+      lastName: user.proveLastName
+    });
   }
 
   const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(proveIssuer, user.did as string, credentialSubjects);
@@ -33,7 +52,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
   const credentialSubjects: CredentialSubject[] = [];
 
   if (!user.did) {
-    logger.error('User did not have a did. This shold never happen.');
+    logger.error('User did not have a did. This should never happen.');
     throw new Error('User did not have a did');
   }
 
@@ -42,11 +61,17 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
   }
 
   if (user.hvGender) {
-    credentialSubjects.push(buildSsnCredentialSubject(user.did as string, user.hvGender));
+    credentialSubjects.push({
+      id: user.did,
+      gender: user.hvGender
+    });
   }
 
   if (user.hvFullName) {
-    credentialSubjects.push(buildPhoneCredentialSubject(user.did as string, user.hvFullName));
+    credentialSubjects.push({
+      id: user.did,
+      fullName: user.hvFullName
+    });
   }
 
   if (user.hvAddress) {

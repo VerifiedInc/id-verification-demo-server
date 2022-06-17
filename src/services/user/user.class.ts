@@ -17,6 +17,7 @@ export interface UserDto {
 
   provePhone: string;
   proveFirstName?: string;
+  proveLastName?: string;
   proveSsn?: string;
   proveDob?: string;
 
