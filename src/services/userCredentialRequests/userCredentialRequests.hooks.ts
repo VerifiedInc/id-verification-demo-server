@@ -2,7 +2,7 @@
 import { SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
 import { BadRequest } from '@feathersjs/errors';
 import { Hook } from '@feathersjs/feathers';
-import { getIssuerEntity } from '../hooks/getIssuerEntity';
+import { getIssuerEntities } from '../hooks/getIssuerEntities';
 import { handleUserDidAssociation } from '../hooks/handleUserDidAssociation';
 import { validateCredentialRequest } from '../hooks/validateCredentialRequest';
 import logger from '../../logger';
@@ -30,7 +30,7 @@ const validateUserCredentialRequest: Hook = async (ctx) => {
 
 export const hooks = {
   before: {
-    create: [getIssuerEntity, validateUserCredentialRequest, handleUserDidAssociation]
+    create: [getIssuerEntities, validateUserCredentialRequest, handleUserDidAssociation]
   },
   after: {
     create: []
