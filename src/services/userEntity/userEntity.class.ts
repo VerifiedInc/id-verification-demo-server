@@ -29,7 +29,7 @@ export class UserEntityService extends MikroOrmService<UserEntity> {
       const entity: UserEntity = await this.get(null, { where: { userCode } }); // will throw exception if not found
       return entity;
     } catch (e) {
-      logger.error(`UserEntityService.getByDid caught an error thrown by this.get. ${e}`);
+      logger.error(`UserEntityService.getByUserCode caught an error thrown by this.get. ${e}`);
       throw e;
     }
   }

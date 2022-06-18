@@ -8,7 +8,7 @@ import { makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkR
 import { IssuerEntity } from '../../entities/Issuer';
 import { issueCredentials } from '@unumid/server-sdk';
 import { CredentialData } from '@unumid/types';
-import { UserEntityOptions } from '../../entities/User';
+import { UserEntity, UserEntityOptions } from '../../entities/User';
 import { UserEntityService } from '../userEntity/userEntity.class';
 import { maskString } from '../../utils/maskString';
 
@@ -115,10 +115,10 @@ export class IdentityService {
 
     if (userCode) {
       // if userCode is present than we have already created a pending user with HV data. We need to get it and patch it with Prove data.
-      userEntity = await this.userEntityService.getByUserCode(userCode);
-      await this.userEntityService.patch(userEntity.uuid, {
+      userEntity = await this.userEntityService.getByUserCode(userCode); // Just getting so can use the uuid to ensure only patching one to appease the types
+      userEntity = await this.userEntityService.patch(userEntity.uuid, {
         ...userEntityOptions
-      });
+      }) as UserEntity;
     } else {
       // no pending user, we need to create one
       userEntity = await this.userEntityService.create(userEntityOptions, params);
