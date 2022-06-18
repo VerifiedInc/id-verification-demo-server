@@ -115,13 +115,13 @@ export class IdentityService {
 
     if (userCode) {
       // if userCode is present than we have already created a pending user with HV data. We need to get it and patch it with Prove data.
-      // userEntity = await this.userEntityService.getByUserCode(userCode); // Just getting so can use the uuid to ensure only patching one to appease the types
-      // userEntity = await this.userEntityService.patch(userEntity.uuid, {
-      //   ...userEntityOptions
-      // }) as UserEntity;
-      userEntity = await this.userEntityService.patch(null, {
+      userEntity = await this.userEntityService.getByUserCode(userCode); // Just getting so can use the uuid to ensure only patching one to appease the types
+      userEntity = await this.userEntityService.patch(userEntity.uuid, {
         ...userEntityOptions
-      }, { where: { userCode } }) as UserEntity;
+      }) as UserEntity;
+      // userEntity = await this.userEntityService.patch(null, {
+      //   ...userEntityOptions
+      // }, { where: { userCode } }) as UserEntity;
     } else {
       // no pending user, we need to create one
       userEntity = await this.userEntityService.create(userEntityOptions, params);
