@@ -119,9 +119,6 @@ export class IdentityService {
       userEntity = await this.userEntityService.patch(userEntity.uuid, {
         ...userEntityOptions
       }) as UserEntity;
-      // userEntity = await this.userEntityService.patch(null, {
-      //   ...userEntityOptions
-      // }, { where: { userCode } }) as UserEntity;
     } else {
       // no pending user, we need to create one
       userEntity = await this.userEntityService.create(userEntityOptions, params);
