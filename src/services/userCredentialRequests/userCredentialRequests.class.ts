@@ -51,7 +51,7 @@ export class UserCredentialRequestsService {
       throw new Error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
     }
 
-    // Note in the userDidAssociation hook we have already ensured that the user has an associated did. However, doing here as well to appease compile time type checking.
+    // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
     const userDid = user.did as string;
 
     /**
@@ -70,17 +70,8 @@ export class UserCredentialRequestsService {
       } else if (credentialRequest.type === 'PhoneCredential' && user.provePhone) {
         credentialSubjects.push(buildPhoneCredentialSubject(userDid, user.provePhone));
       } else if (credentialRequest.type === 'FirstNameCredential' && user.proveFirstName) {
-        credentialSubjects.push({
-          type: 'LastNameCredential',
-          firstName: user.proveFirstName
-        });
+        credentialSubjects.push({ type: 'LastNameCredential', firstName: user.proveFirstName });
       } else if (credentialRequest.type === 'LastNameCredential' && user.proveLastName) {
-        // credentialSubjects.push({
-        //   id: userDid,
-        //   type: 'LastNameCredential',
-        //   lastName: user.proveLastName
-        // });
-        // credentialSubjects.push(buildAtomicCredentialData('LastNameCredential', 'lastName', user.proveLastName));
         credentialSubjects.push({ type: 'LastNameCredential', lastName: user.proveLastName });
       }
     });
@@ -126,7 +117,7 @@ export class UserCredentialRequestsService {
       throw new Error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
     }
 
-    // Note in the userDidAssociation hook we have already ensured that the user has an associated did. However, doing here as well to appease compile time type checking.
+    // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
     const userDid = user.did as string;
 
     /**
@@ -145,10 +136,7 @@ export class UserCredentialRequestsService {
       } else if (credentialRequest.type === 'FullNameCredential' && user.hvFullName) {
         credentialSubjects.push({ type: 'FullNameCredential', fullName: user.hvFullName });
       } else if (credentialRequest.type === 'AddressCredential' && user.hvAddress) {
-        credentialSubjects.push({
-          type: 'AddressCredential',
-          address: user.hvAddress
-        });
+        credentialSubjects.push({ type: 'AddressCredential', address: user.hvAddress });
       }
     });
 

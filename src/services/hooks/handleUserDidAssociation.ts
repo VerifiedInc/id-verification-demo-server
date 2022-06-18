@@ -67,9 +67,9 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
   // verify the subject did document; issuer.did is strictly for receipt / audit log entry creation
   const result: UnumDto<VerifiedStatus> = await verifySignedDid(proveIssuerEntity.authToken, proveIssuerEntity.did, did);
 
-  // if (!result.body.isVerified) {
-  //   throw new Error(`${result.body.message} Subject DID document ${did.id} for user ${userCode} is not verified.`);
-  // } // TODO DO NOT COMMIT
+  if (!result.body.isVerified) {
+    throw new Error(`${result.body.message} Subject DID document ${did.id} for user ${userCode} is not verified.`);
+  }
 
   // update the proveIssuerEntity issuer's auth token if it has been reissued
   if (result.authToken !== proveIssuerEntity.authToken) {

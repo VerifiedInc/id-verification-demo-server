@@ -3,7 +3,6 @@ import { ServiceAddons } from '@feathersjs/feathers';
 import { Application } from '../../declarations';
 import { HyperVergeService } from './hyperVerge.class';
 import hooks from './hyperVerge.hooks';
-// import { VerificationOptions } from '@unumid/web-wallet-types';
 
 // Add this service to the service type index
 declare module '../../declarations' {
