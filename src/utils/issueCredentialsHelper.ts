@@ -1,22 +1,47 @@
 import { issueCredentials, UnumDto } from '@unumid/server-sdk';
-import { CredentialData, CredentialPb } from '@unumid/types';
+import { CredentialData, CredentialPb, CredentialSubject } from '@unumid/types';
 import { IssuerEntity } from '../entities/Issuer';
 import logger from '../logger';
 import { formatBearerToken } from './formatBearerToken';
 
-export interface PhoneCredentialSubject extends CredentialData{
+export interface PhoneCredentialSubject extends CredentialData {
   id: string;
   phone: string;
 }
 
-export interface DobCredentialSubject extends CredentialData{
+export interface DobCredentialSubject extends CredentialData {
   id: string;
   dob: string;
 }
 
-export interface SsnCredentialSubject extends CredentialData{
+export interface SsnCredentialSubject extends CredentialData {
   id: string;
   ssn: string;
+}
+
+export interface FullNameCredentialSubject extends CredentialData {
+  id: string;
+  fullName: string;
+}
+
+export interface FirstNameCredentialSubject extends CredentialData {
+  id: string;
+  firstName: string;
+}
+
+export interface LastNameCredentialSubject extends CredentialData {
+  id: string;
+  lastName: string;
+}
+
+export interface AddressCredentialSubject extends CredentialData {
+  id: string;
+  address: string;
+}
+
+export interface GenderCredentialSchema extends CredentialData {
+  id: string;
+  gender: string;
 }
 
 export const issueCredentialsHelper = async (
@@ -64,4 +89,31 @@ export function buildPhoneCredentialSubject (did: string, phone: string): PhoneC
     type: 'PhoneCredential',
     phone
   };
+}
+
+export function buildFirstNameCredentialSubject (did: string, firstName: string): FirstNameCredentialSubject {
+  return {
+    id: did,
+    type: 'FirstNameCredential',
+    firstName
+  };
+}
+
+export function buildAtomicCredentialData (type: string, key: string, value: string): CredentialData {
+  const subject: CredentialData = {
+    type
+  };
+
+  subject[key] = value;
+  return subject;
+}
+
+export function buildAtomicCredentialSubject (did: string, type: string, key: string, value: string): CredentialSubject {
+  const subject: CredentialSubject = {
+    id: did,
+    type
+  };
+
+  subject[key] = value;
+  return subject;
 }

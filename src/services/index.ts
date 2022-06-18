@@ -3,6 +3,7 @@ import AuthService from './auth/auth.service';
 import EligibilityService from './eligibility/eligibility.service';
 import GetAuthPathService from './getAuthPath/getAuthPath.service';
 import GetAuthUrlService from './getAuthUrl/getAuthUrl.service';
+import HyperVergeService from './hyperVerge/hyperVerge.service';
 import HyperVergeAuth from './hyperVergeAuth/hyperVergeAuth.service';
 import IdentityService from './identity/identity.service';
 import IssuerService from './issuer/issuer.service';
@@ -21,6 +22,7 @@ export default function (app: Application): void {
   app.configure(GetAuthPathService);
   app.configure(EligibilityService);
   app.configure(IdentityService);
+  app.configure(HyperVergeService);
   app.configure(IssuerEntityService);
   app.configure(IssuerService);
   app.configure(UserCredentialRequestsService);

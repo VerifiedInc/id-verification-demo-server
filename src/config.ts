@@ -25,6 +25,8 @@ interface Config {
   FROM_NUMBER: string;
   ACCOUNT_SID: string;
   AUTH_TOKEN: string;
+  PROVE_ISSUER_DID: string;
+  HV_ISSUER_DID: string;
 }
 
 const {
@@ -48,6 +50,8 @@ const {
   FROM_NUMBER = '',
   ACCOUNT_SID = '',
   AUTH_TOKEN = '',
+  PROVE_ISSUER_DID = '',
+  HV_ISSUER_DID = '',
   TEST_DB_NAME = '',
   TEST_DB_HOST = 'localhost',
   TEST_DB_PORT = '5432',
@@ -87,5 +91,7 @@ export const config: Config = {
   FROM_NUMBER,
   ACCOUNT_SID,
   AUTH_TOKEN,
+  PROVE_ISSUER_DID,
+  HV_ISSUER_DID,
   ...dbConfig
 };

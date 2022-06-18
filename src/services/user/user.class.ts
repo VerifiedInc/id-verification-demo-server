@@ -12,12 +12,19 @@ interface ServiceOptions {}
 
 export interface UserDto {
   uuid: string;
-  firstName?: string;
   did?: string;
   userCode?: string;
-  phone: string;
-  dob?: string,
-  ssn?: string,
+
+  provePhone?: string;
+  proveFirstName?: string;
+  proveLastName?: string;
+  proveSsn?: string;
+  proveDob?: string;
+
+  hvDob?: string;
+  hvGender?: string;
+  hvFullName?: string;
+  hvAddress?: string;
 }
 
 export class UserService {
@@ -36,10 +43,10 @@ export class UserService {
 
     // ensure that a user with the phone does not already exist
     try {
-      entity = await this.entityService.getByEmail(data.phone);
+      entity = await this.entityService.getByPhone(data.provePhone as string);
 
       if (entity) {
-        logger.info(`User with email ${data.phone} already exists with uuid ${entity.uuid}`);
+        logger.info(`User with email ${data.provePhone} already exists with uuid ${entity.uuid}`);
         return entity;
       }
     } catch (e) {
@@ -68,12 +75,12 @@ export class UserService {
     return entity;
   }
 
-  async getByEmail (email: string): Promise<UserEntity> {
+  async getByPhone (email: string): Promise<UserEntity> {
     try {
-      const entity = await this.entityService.getByEmail(email);
+      const entity = await this.entityService.getByPhone(email);
       return entity;
     } catch (e) {
-      logger.error(`UserService.getByEmail caught an error thrown by this.get. ${e}`);
+      logger.error(`UserService.getByPhone caught an error thrown by this.get. ${e}`);
       throw e;
     }
   }

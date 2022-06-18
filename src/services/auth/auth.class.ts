@@ -11,6 +11,9 @@ interface AuthTokens {
   refresh_token: string;
 }
 
+/**
+ * Prove Auth Service
+ */
 export class AuthService {
   app: Application;
 

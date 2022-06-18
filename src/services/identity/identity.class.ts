@@ -8,7 +8,7 @@ import { makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkR
 import { IssuerEntity } from '../../entities/Issuer';
 import { issueCredentials } from '@unumid/server-sdk';
 import { CredentialData } from '@unumid/types';
-import { UserEntityOptions } from '../../entities/User';
+import { UserEntity, UserEntityOptions } from '../../entities/User';
 import { UserEntityService } from '../userEntity/userEntity.class';
 import { maskString } from '../../utils/maskString';
 
@@ -50,7 +50,7 @@ export interface IndividualInfoDetailed {
   dob: string
 }
 
-export interface identityResponse {
+export interface IdentityResponse {
   transactionId: string;
   phoneNumber: string;
   lineType: string,
@@ -58,6 +58,12 @@ export interface identityResponse {
   countryCode: string,
   reasonCodes: string[],
   individual: IndividualInfoDetailed
+}
+
+export interface IdentityOptions {
+  phoneNumber: string;
+  dob?: string;
+  userCode?: string;
 }
 
 export class IdentityService {
@@ -70,7 +76,9 @@ export class IdentityService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async create (data: any, params?: Params): Promise<WalletUserDidAssociation<identityResponse>> {
+  async create (data: any, params?: Params): Promise<WalletUserDidAssociation<IdentityResponse>> {
+    const { phoneNumber, dob, userCode } = data;
+
     const authService = this.app.service('auth');
     const authResponse = await authService.create({}, params);
     const authorization = authResponse.access_token;
@@ -85,33 +93,47 @@ export class IdentityService {
       },
       data: {
         requestId: uuidv4(),
-        phoneNumber: data.phoneNumber,
-        dob: data.dob,
-        ssn: data.ssn,
-        last4: data.last4
+        phoneNumber,
+        dob
+        // ssn: data.ssn,
+        // last4: data.last4
       }
     };
 
-    const response = await makeNetworkRequest<ProveServiceResponseV2<identityResponse>>(restData);
-    const identityData: identityResponse = response.body.response;
+    const response = await makeNetworkRequest<ProveServiceResponseV2<IdentityResponse>>(restData);
+    const identityData: IdentityResponse = response.body.response;
 
     // need to store the data until the user has a did to issue credentials to
     const userEntityOptions: UserEntityOptions = {
-      dob: identityData.individual.dob,
-      ssn: maskString(identityData.individual.ssn, 2),
-      phone: identityData.phoneNumber,
+      proveDob: identityData.individual.dob,
+      proveSsn: maskString(identityData.individual.ssn, 2),
+      provePhone: identityData.phoneNumber,
       userCode: v4()
     };
 
-    const userEntity = await this.userEntityService.create(userEntityOptions, params);
+    let userEntity;
 
-    // get issuer
+    if (userCode) {
+      // if userCode is present than we have already created a pending user with HV data. We need to get it and patch it with Prove data.
+      userEntity = await this.userEntityService.getByUserCode(userCode); // Just getting so can use the uuid to ensure only patching one to appease the types
+      userEntity = await this.userEntityService.patch(userEntity.uuid, {
+        ...userEntityOptions
+      }) as UserEntity;
+      // userEntity = await this.userEntityService.patch(null, {
+      //   ...userEntityOptions
+      // }, { where: { userCode } }) as UserEntity;
+    } else {
+      // no pending user, we need to create one
+      userEntity = await this.userEntityService.create(userEntityOptions, params);
+    }
+
+    // get issuer did for UnumID saas to know where to send the /subjectCredentialRequest callback request. We will then issue credentials from HV and Prove in the handler.
     const issuerEntityService = this.app.service('issuerEntity');
-    const issuer: IssuerEntity = await issuerEntityService.getDefaultIssuerEntity();
+    const proveIssuer: IssuerEntity = await issuerEntityService.getProveIssuerEntity();
 
     return {
       userCode: userEntity.userCode as string,
-      issuerDid: issuer.did,
+      issuerDid: proveIssuer.did,
       proveResponse: response.body
     };
   }
