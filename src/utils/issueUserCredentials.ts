@@ -65,7 +65,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
   if (user.hvGender) {
     credentialSubjects.push({
       id: user.did,
-      type: 'genderCredential',
+      type: 'GenderCredential',
       gender: user.hvGender
     });
   }
