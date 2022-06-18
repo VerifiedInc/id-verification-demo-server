@@ -67,7 +67,7 @@ export class UserCredentialRequestsService {
         credentialSubjects.push(buildDobCredentialSubject(userDid, user.proveDob));
       } else if (credentialRequest.type === 'SsnCredential' && user.proveSsn) {
         credentialSubjects.push(buildSsnCredentialSubject(userDid, user.proveSsn));
-      } else if (credentialRequest.type === 'PhoneCredential') {
+      } else if (credentialRequest.type === 'PhoneCredential' && user.provePhone) {
         credentialSubjects.push(buildPhoneCredentialSubject(userDid, user.provePhone));
       } else if (credentialRequest.type === 'FirstNameCredential' && user.proveFirstName) {
         credentialSubjects.push({

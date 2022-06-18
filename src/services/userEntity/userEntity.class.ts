@@ -23,4 +23,14 @@ export class UserEntityService extends MikroOrmService<UserEntity> {
       throw e;
     }
   }
+
+  async getByUserCode (userCode: string): Promise<UserEntity> {
+    try {
+      const entity: UserEntity = await this.get(null, { where: { userCode } }); // will throw exception if not found
+      return entity;
+    } catch (e) {
+      logger.error(`UserEntityService.getByDid caught an error thrown by this.get. ${e}`);
+      throw e;
+    }
+  }
 }

@@ -7,7 +7,7 @@ export interface UserEntityOptions extends BaseEntityOptions {
   did?: string;
   userCode?: string;
 
-  provePhone: string;
+  provePhone?: string;
   proveFirstName?: string;
   proveSsn?: string;
   proveDob?: string;
@@ -44,7 +44,7 @@ export class UserEntity extends BaseEntity {
   userCode?: string;
 
   @Property()
-  provePhone: string; // provePhone
+  provePhone?: string; // provePhone
 
   @Property()
   proveDob?: string; // proveDob

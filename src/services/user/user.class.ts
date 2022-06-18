@@ -15,7 +15,7 @@ export interface UserDto {
   did?: string;
   userCode?: string;
 
-  provePhone: string;
+  provePhone?: string;
   proveFirstName?: string;
   proveLastName?: string;
   proveSsn?: string;
@@ -43,7 +43,7 @@ export class UserService {
 
     // ensure that a user with the phone does not already exist
     try {
-      entity = await this.entityService.getByPhone(data.provePhone);
+      entity = await this.entityService.getByPhone(data.provePhone as string);
 
       if (entity) {
         logger.info(`User with email ${data.provePhone} already exists with uuid ${entity.uuid}`);

@@ -58,7 +58,7 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
   }
 
   try {
-    user = await userEntityService.get(null, { where: { userCode } }); // will throw exception if not found
+    user = await userEntityService.getByUserCode(userCode); // will throw exception if not found
   } catch (e) {
     logger.warn(`No user found with code ${userCode}. Can not associate the did ${did.id}.`);
     throw e;

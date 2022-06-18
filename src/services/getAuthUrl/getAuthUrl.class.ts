@@ -13,6 +13,12 @@ export interface AuthUrlResponse {
   MobileOperatorName: string;
 }
 
+export interface AuthUrlOptions {
+  userCode: string;
+  dob?: string;
+  mobileNumber: string; // actually not sure this is needed anymore with the instant redirect
+}
+
 export class GetAuthUrlService {
   app: Application;
 
@@ -21,10 +27,9 @@ export class GetAuthUrlService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async create (data: any, params?: Params): Promise<ProveServiceResponseV1<AuthUrlResponse>> {
-    const authorization = data.authorization;
-
+  async create (data: AuthUrlOptions, params?: Params): Promise<ProveServiceResponseV1<AuthUrlResponse>> {
     // logger.debug(`fe url: ${config.FRONTEND_URL}`);
+    const { userCode, dob, mobileNumber } = data;
 
     const restData: RESTData = {
       method: 'POST',
@@ -36,8 +41,8 @@ export class GetAuthUrlService {
         SessionId: 'SubmittedSessionId', // TODO
         ApiClientId: config.PROVE_CLIENT_ID,
         SourceIp: '127.0.0.1', // TODO
-        FinalTargetUrl: `${config.FRONTEND_URL}?dob=${data.dob}&phone=${data.mobileNumber}`,
-        MobileNumber: data.mobileNumber
+        FinalTargetUrl: `${config.FRONTEND_URL}?dob=${dob}&userCode=${userCode}&&phone=${mobileNumber}`,
+        MobileNumber: mobileNumber
       }
     };
 
