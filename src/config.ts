@@ -19,6 +19,7 @@ interface Config {
   PROVE_USERNAME: string;
   PROVE_PASSWORD: string;
   PROVE_CLIENT_ID: string;
+  PROVE_SUB_CLIENT_ID: string;
   HYPER_VERGE_SAAS_URL: string;
   HYPER_VERGE_APP_ID: string;
   HYPER_VERGE_APP_KEY: string;
@@ -44,6 +45,7 @@ const {
   PROVE_USERNAME = '',
   PROVE_PASSWORD = '',
   PROVE_CLIENT_ID = '',
+  PROVE_SUB_CLIENT_ID = '',
   HYPER_VERGE_SAAS_URL = '',
   HYPER_VERGE_APP_ID = '',
   HYPER_VERGE_APP_KEY = '',
@@ -85,6 +87,7 @@ export const config: Config = {
   PROVE_USERNAME,
   PROVE_PASSWORD,
   PROVE_CLIENT_ID,
+  PROVE_SUB_CLIENT_ID,
   HYPER_VERGE_SAAS_URL,
   HYPER_VERGE_APP_ID,
   HYPER_VERGE_APP_KEY,
