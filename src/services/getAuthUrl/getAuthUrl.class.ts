@@ -40,6 +40,7 @@ export class GetAuthUrlService {
         RequestId: uuidv4(),
         SessionId: 'SubmittedSessionId', // TODO
         ApiClientId: config.PROVE_CLIENT_ID,
+        SubClientId: config.PROVE_SUB_CLIENT_ID,
         SourceIp: '127.0.0.1', // TODO
         FinalTargetUrl: `${config.FRONTEND_URL}?dob=${dob}&userCode=${userCode}&&phone=${mobileNumber}`,
         MobileNumber: mobileNumber
