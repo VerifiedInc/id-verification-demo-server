@@ -28,6 +28,7 @@ export class GetAuthPathService {
       data: {
         RequestId: uuidv4(),
         ApiClientId: config.PROVE_CLIENT_ID,
+        SubClientId: config.PROVE_SUB_CLIENT_ID,
         VerificationFingerprint: data.verificationFingerprint
       }
     };
