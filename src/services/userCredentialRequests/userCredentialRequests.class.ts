@@ -174,10 +174,10 @@ export class UserCredentialRequestsService {
       };
     }
 
-    const { credentialRequestsInfo: { issuerDid } } = data;
-
+    // Issuer entities added to params in before hook getIssuerEntities
     const proveIssuer: IssuerEntity = params?.proveIssuerEntity;
     const hvIssuer: IssuerEntity = params?.hvIssuerEntity;
+    const { credentialRequestsInfo: { issuerDid } } = data;
 
     // handling credential requests for which ever issuer is being specified. Can only be one per request.
     if (proveIssuer.did === issuerDid) {
