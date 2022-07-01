@@ -7,6 +7,7 @@ import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
 import { UserDto } from '../user/user.class';
 import { buildAtomicCredentialData, buildAtomicCredentialSubject, buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, DobCredentialSubject, issueCredentialsHelper, PhoneCredentialSubject, SsnCredentialSubject } from '../../utils/issueCredentialsHelper';
+import { BadRequest } from '@feathersjs/errors';
 
 export type ValidCredentialTypes = PhoneCredentialSubject | SsnCredentialSubject | DobCredentialSubject;
 
@@ -158,14 +159,41 @@ export class UserCredentialRequestsService {
     };
   }
 
+  /**
+   * User Credential Requests are normally only made for one issuer. This demo is an exception because we are acting as more than one issuer.
+   * However because of the normal usage User Credential Requests are made for one issuer per request.
+   * @param data
+   * @param params
+   * @returns
+   */
   async create (data: UserCredentialRequests, params?: Params): Promise<CredentialsIssuedResponse> {
-    const proveResult = await this.handleProveCredentials(data, params);
-    const hvResult = await this.handleHvCredentials(data, params);
+    if (!data.credentialRequestsInfo) {
+      // short circuit as no requests for credentials
+      return {
+        credentialTypesIssued: []
+      };
+    }
 
-    const result = proveResult.credentialTypesIssued.concat(hvResult.credentialTypesIssued);
+    // Issuer entities added to params in before hook getIssuerEntities
+    const proveIssuer: IssuerEntity = params?.proveIssuerEntity;
+    const hvIssuer: IssuerEntity = params?.hvIssuerEntity;
+    const { credentialRequestsInfo: { issuerDid } } = data;
 
-    return {
-      credentialTypesIssued: result
-    };
+    // handling credential requests for which ever issuer is being specified. Can only be one per request.
+    if (proveIssuer.did === issuerDid) {
+      const proveResult = await this.handleProveCredentials(data, params);
+
+      return {
+        credentialTypesIssued: proveResult.credentialTypesIssued
+      };
+    } else if (hvIssuer.did === issuerDid) {
+      const hvResult = await this.handleHvCredentials(data, params);
+
+      return {
+        credentialTypesIssued: hvResult.credentialTypesIssued
+      };
+    } else {
+      throw new BadRequest(`Unsupported issuerDid in /userCredentialRequest ${issuerDid}`);
+    }
   }
 }
