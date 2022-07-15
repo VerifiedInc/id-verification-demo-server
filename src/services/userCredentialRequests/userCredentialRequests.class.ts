@@ -8,6 +8,7 @@ import logger from '../../logger';
 import { UserDto } from '../user/user.class';
 import { buildAtomicCredentialData, buildAtomicCredentialSubject, buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, DobCredentialSubject, issueCredentialsHelper, PhoneCredentialSubject, SsnCredentialSubject } from '../../utils/issueCredentialsHelper';
 import { BadRequest } from '@feathersjs/errors';
+import _ from 'lodash';
 
 export type ValidCredentialTypes = PhoneCredentialSubject | SsnCredentialSubject | DobCredentialSubject;
 
@@ -17,6 +18,7 @@ export type CredentialsIssuedResponse = {
 
 export interface UserCredentialRequests extends SubjectCredentialRequestsEnrichedDto {
   user: UserDto;
+  credentialsIssuedByDidAssociation: CredentialPb[]
 }
 
 /**
@@ -167,10 +169,13 @@ export class UserCredentialRequestsService {
    * @returns
    */
   async create (data: UserCredentialRequests, params?: Params): Promise<CredentialsIssuedResponse> {
+    // cut off the preceding 'VerifiableCredential' string in each credential type array
+    const credentialTypesIssuedByDidAssociation = data.credentialsIssuedByDidAssociation.flatMap(cred => !_.isEmpty(cred.type) && cred.type[0] === 'VerifiableCredential' ? cred.type.slice(1) : cred.type);
+
     if (!data.credentialRequestsInfo) {
       // short circuit as no requests for credentials
       return {
-        credentialTypesIssued: []
+        credentialTypesIssued: credentialTypesIssuedByDidAssociation
       };
     }
 
@@ -184,13 +189,15 @@ export class UserCredentialRequestsService {
       const proveResult = await this.handleProveCredentials(data, params);
 
       return {
-        credentialTypesIssued: proveResult.credentialTypesIssued
+        // return the credential types requested that were issued by the HV issuer + those issued part of the did association
+        credentialTypesIssued: proveResult.credentialTypesIssued.concat(credentialTypesIssuedByDidAssociation)
       };
     } else if (hvIssuer.did === issuerDid) {
       const hvResult = await this.handleHvCredentials(data, params);
 
       return {
-        credentialTypesIssued: hvResult.credentialTypesIssued
+        // return the credential types requested that were issued by the HV issuer + those issued part of the did association
+        credentialTypesIssued: hvResult.credentialTypesIssued.concat(credentialTypesIssuedByDidAssociation)
       };
     } else {
       throw new BadRequest(`Unsupported issuerDid in /userCredentialRequest ${issuerDid}`);
