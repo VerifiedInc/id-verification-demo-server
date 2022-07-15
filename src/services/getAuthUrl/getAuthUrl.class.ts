@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Application, ProveServiceResponseV1 } from '../../declarations';
 
 import logger from '../../logger';
-import { makeNetworkRequest, RESTData, RESTResponse } from '../../utils/networkRequestHelper';
+import { makeNetworkRequest, RESTData } from '../../utils/networkRequestHelper';
 import { sendSms } from '../../utils/sendSms';
 
 export interface AuthUrlResponse {
@@ -28,14 +28,12 @@ export class GetAuthUrlService {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async create (data: AuthUrlOptions, params?: Params): Promise<ProveServiceResponseV1<AuthUrlResponse>> {
-    // logger.debug(`fe url: ${config.FRONTEND_URL}`);
     const { userCode, dob, mobileNumber } = data;
 
     const restData: RESTData = {
       method: 'POST',
       baseUrl: config.PROVE_SAAS_URL,
       endPoint: '/fortified/2015/06/01/getAuthUrl',
-      // header: { Authorization: authorization },
       data: {
         RequestId: uuidv4(),
         SessionId: 'SubmittedSessionId', // TODO
