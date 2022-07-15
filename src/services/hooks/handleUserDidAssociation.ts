@@ -83,6 +83,7 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
   }
 
   const userDid = did.id;
+  const credentialsIssued: CredentialPb[] = [];
 
   // if this is a new DID association for the user then we need to revoke all the credentials associated with teh old did document
   if (userDid !== user.did) {
@@ -98,6 +99,9 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     // now that the user has a DID we can issue Prove credentials for the user
     const proveIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueProveUserCredentials(user, proveIssuerEntity);
 
+    // add the credentials to result list for the response body
+    credentialsIssued.push(...proveIssuedCredentialDto.body);
+
     // update the prove issuer's auth token if it has been reissued
     if (proveIssuedCredentialDto.authToken !== proveIssuerEntity.authToken) {
       const userEntityService = ctx.app.service('issuerEntity');
@@ -111,6 +115,9 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
 
     // now that the user has a DID we can issue HV credentials for the user
     const hvIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueHvUserCredentials(user, hvIssuerEntity);
+
+    // add the credentials to result list for the response body
+    credentialsIssued.push(...hvIssuedCredentialDto.body);
 
     // update the hv issuer's auth token if it has been reissued
     if (hvIssuedCredentialDto.authToken !== hvIssuerEntity.authToken) {
@@ -131,7 +138,8 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     ...ctx,
     data: {
       ...ctx.data,
-      user
+      user,
+      credentialsIssuedByDidAssociation: credentialsIssued
     }
   };
 };
