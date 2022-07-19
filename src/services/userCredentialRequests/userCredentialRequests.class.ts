@@ -140,6 +140,22 @@ export class UserCredentialRequestsService {
         credentialSubjects.push({ type: 'FullNameCredential', fullName: user.hvFullName });
       } else if (credentialRequest.type === 'AddressCredential' && user.hvAddress) {
         credentialSubjects.push({ type: 'AddressCredential', address: user.hvAddress });
+      } else if (credentialRequest.type === 'GovernmentIdDocumentImageCredential' && user.hvDocImage) {
+        credentialSubjects.push({ type: 'GovernmentIdDocumentImageCredential', image: user.hvDocImage });
+      } else if (credentialRequest.type === 'CountryResidenceCredential' && user.hvDocCountry) {
+        credentialSubjects.push({ type: 'CountryResidenceCredential', country: user.hvDocCountry });
+      } else if (credentialRequest.type === 'GovernmentIdTypeCredential' && user.hvDocType) {
+        credentialSubjects.push({ type: 'GovernmentIdTypeCredential', documentType: user.hvDocType });
+      } else if (credentialRequest.type === 'FacialImageCredential' && user.hvFaceImage) {
+        credentialSubjects.push({ type: 'FacialImageCredential', image: user.hvFaceImage });
+      } else if (credentialRequest.type === 'LivelinessCredential' && user.hvLiveFace) {
+        credentialSubjects.push({ type: 'LivelinessCredential', liveliness: user.hvLiveFace });
+      } else if (credentialRequest.type === 'LivelinessConfidenceCredential' && user.hvLiveFaceConfidence) {
+        credentialSubjects.push({ type: 'LivelinessConfidenceCredential', confidence: user.hvLiveFaceConfidence });
+      } else if (credentialRequest.type === 'FacialMatchCredential' && user.hvFaceMatch) {
+        credentialSubjects.push({ type: 'FacialMatchCredential', match: user.hvFaceMatch });
+      } else if (credentialRequest.type === 'FacialMatchConfidenceCredential' && user.hvFaceMatchConfidence) {
+        credentialSubjects.push({ type: 'FacialMatchConfidenceCredential', confidence: user.hvFaceMatchConfidence });
       }
     });
 
