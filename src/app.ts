@@ -20,6 +20,7 @@ import authentication from './authentication';
 import { health } from 'feathers-alive-ready';
 import { setupSaaSFeathersServiceClient } from './clients/saasClient';
 import { setupMikroOrm } from './setupMikroOrm';
+import { config } from './config';
 
 export type HookContext<T = any> = { app: Application } & FeathersHookContext<T>;
 
@@ -37,7 +38,9 @@ export default async function generateApp (): Promise<Application> {
   app.use(helmet({
     contentSecurityPolicy: false
   }));
-  app.use(cors());
+  app.use(cors({
+    origin: 'https://id-verification.demo.dev-unumid.co'
+  }));
   app.use(compress());
   app.use(express.json({ limit: '100mb' }));
   app.use(express.urlencoded({ limit: '100mb', extended: true }));
