@@ -96,7 +96,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
       credentialSubjects.push({
         id: user.did,
         type: 'CountryResidenceCredential',
-        residence: user.hvDocCountry
+        country: user.hvDocCountry
     });
 
     if (user.hvDocType) {
