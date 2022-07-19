@@ -84,6 +84,62 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
       type: 'AddressCredential',
       address: user.hvAddress
     });
+
+    if (user.hvDocImage) {
+      credentialSubjects.push({
+        id: user.did,
+        type: 'GovernmentIdDocumentImageCredential',
+        image: user.hvDocImage
+    });
+
+    if (user.hvDocCountry) {
+      credentialSubjects.push({
+        id: user.did,
+        type: 'CountryResidenceCredential',
+        residence: user.hvDocCountry
+    });
+
+    if (user.hvDocType) {
+      credentialSubjects.push({
+        id: user.did,
+        type: 'GovernmentIdTypeCredential',
+        documentType: user.hvDocType
+    });
+
+    if (user.hvFaceImage) {
+      credentialSubjects.push({
+        id: user.did,
+        type: 'FacialImageCredential',
+        image: user.hvFaceImage
+    });
+
+    if (user.hvLiveFace) {
+      credentialSubjects.push({
+        id: user.did,
+        type: 'LivelinessCredential',
+        liveliness: user.hvLiveFace
+    });
+
+    if (user.hvLiveFaceConfidence) {
+      credentialSubjects.push({
+        id: user.did,
+        type: 'LivelinessConfidenceCredential',
+        confidence: user.hvLiveFaceConfidence
+    });
+
+    if (user.hvFaceMatch) {
+      credentialSubjects.push({
+        id: user.did,
+        type: 'FacialMatchCredential',
+        match: user.hvFaceMatch
+    });
+
+    if (user.hvFaceMatchConfidence) {
+      credentialSubjects.push({
+        id: user.did,
+        type: 'FacialMatchConfidenceCredential',
+        facialMatchConfidence: user.hvFaceMatchConfidence
+    });
   }
 
   const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, user.did as string, credentialSubjects);
