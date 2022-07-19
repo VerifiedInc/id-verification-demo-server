@@ -16,6 +16,15 @@ export interface UserEntityOptions extends BaseEntityOptions {
   hvGender?: string;
   hvFullName?: string;
   hvAddress?: string;
+
+  hvDocImage?: string; // base64
+  hvFaceImage?: string; // base64
+  hvDocCountry?: string; // i.e. 'usa'
+  hvDocType?: string; // i.e. 'dl'
+  hvLiveFace?: string;
+  hvLiveFaceConfidence?: string;
+  hvFaceMatch?: string;
+  hvFaceMatchConfidence?: string;
 }
 
 @Entity({ tableName: 'User' })
@@ -35,6 +44,15 @@ export class UserEntity extends BaseEntity {
     this.hvGender = options.hvGender;
     this.hvFullName = options.hvFullName;
     this.hvAddress = options.hvAddress;
+
+    this.hvDocImage = options.hvDocImage;
+    this.hvFaceImage = options.hvFaceImage;
+    this.hvDocCountry = options.hvDocCountry;
+    this.hvDocType = options.hvDocType;
+    this.hvLiveFace = options.hvLiveFace;
+    this.hvLiveFaceConfidence = options.hvLiveFaceConfidence;
+    this.hvFaceMatch = options.hvFaceMatch;
+    this.hvFaceMatchConfidence = options.hvFaceMatchConfidence;
   }
 
   @Property()
@@ -69,4 +87,28 @@ export class UserEntity extends BaseEntity {
 
   @Property()
   hvAddress?: string;
+
+  @Property({ columnType: 'text' })
+  hvDocImage?: string; // base64
+
+  @Property({ columnType: 'text' })
+  hvFaceImage?: string; // base64
+
+  @Property()
+  hvDocCountry?: string; // i.e. 'usa'
+
+  @Property()
+  hvDocType?: string; // i.e. 'dl'
+
+  @Property()
+  hvLiveFace?: string;
+
+  @Property()
+  hvLiveFaceConfidence?: string;
+
+  @Property()
+  hvFaceMatch?: string;
+
+  @Property()
+  hvFaceMatchConfidence?: string;
 }
