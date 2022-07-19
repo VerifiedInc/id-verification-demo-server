@@ -10,15 +10,6 @@ export interface HyperVergeResponse {
   userCode: string;
 }
 
-// interface KYCData {
-//   address: string;
-//   age: string;
-//   dob: string;
-//   gender: string;
-//   fullName: string;
-//   idType: string;
-// }
-
 /**
  * Service to receive and persist HV KYC data from the client.
  */
