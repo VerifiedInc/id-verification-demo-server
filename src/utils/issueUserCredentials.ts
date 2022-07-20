@@ -53,6 +53,8 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
   // const credentialSubjects: ValidCredentialTypes[] = [];
   const credentialSubjects: CredentialData[] = [];
 
+  logger.info(`Issuing hyperverge credentials to user ${user.did}`);
+
   if (!user.did) {
     logger.error('User did not have a did. This should never happen.');
     throw new Error('User did not have a did');
@@ -149,6 +151,8 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
       facialMatchConfidence: user.hvFaceMatchConfidence
     });
   }
+
+  logger.debug(`Created all credential subjects for hyperverge credentials user ${user.did}`);
 
   const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, user.did as string, credentialSubjects);
 
