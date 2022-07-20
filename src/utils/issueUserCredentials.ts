@@ -88,13 +88,13 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
     });
   }
 
-  if (user.hvDocImage) {
-    credentialSubjects.push({
-      id: user.did,
-      type: 'GovernmentIdDocumentImageCredential',
-      image: user.hvDocImage
-    });
-  }
+  // if (user.hvDocImage) {
+  //   credentialSubjects.push({
+  //     id: user.did,
+  //     type: 'GovernmentIdDocumentImageCredential',
+  //     image: user.hvDocImage
+  //   });
+  // }
 
   if (user.hvDocCountry) {
     credentialSubjects.push({
@@ -112,13 +112,13 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
     });
   }
 
-  if (user.hvFaceImage) {
-    credentialSubjects.push({
-      id: user.did,
-      type: 'FacialImageCredential',
-      image: user.hvFaceImage
-    });
-  }
+  // if (user.hvFaceImage) {
+  //   credentialSubjects.push({
+  //     id: user.did,
+  //     type: 'FacialImageCredential',
+  //     image: user.hvFaceImage
+  //   });
+  // }
 
   if (user.hvLiveFace) {
     credentialSubjects.push({
@@ -152,7 +152,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
     });
   }
 
-  logger.debug(`Created all credential subjects for hyperverge credentials user ${user.did}`);
+  logger.debug(`Created ${credentialSubjects.length} credential subjects for hyperverge credentials for user ${user.did}`);
 
   const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, user.did as string, credentialSubjects);
 
