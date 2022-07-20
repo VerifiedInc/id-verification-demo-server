@@ -25,6 +25,15 @@ export interface UserDto {
   hvGender?: string;
   hvFullName?: string;
   hvAddress?: string;
+
+  hvDocImage?: string; // base64
+  hvFaceImage?: string; // base64
+  hvDocCountry?: string; // i.e. 'usa'
+  hvDocType?: string; // i.e. 'dl'
+  hvLiveFace?: string;
+  hvLiveFaceConfidence?: string;
+  hvFaceMatch?: string;
+  hvFaceMatchConfidence?: string;
 }
 
 export class UserService {

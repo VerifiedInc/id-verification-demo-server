@@ -52,6 +52,8 @@ export const issueCredentialsHelper = async (
   let authCredentialResponse;
 
   try {
+    logger.debug(`Calling issuerCredentials with date list: ${JSON.stringify(credentialDataList)}`);
+
     authCredentialResponse = await issueCredentials(
       formatBearerToken(issuerEntity.authToken),
       issuerEntity.did,

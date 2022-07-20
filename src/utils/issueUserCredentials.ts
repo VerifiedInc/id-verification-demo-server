@@ -53,6 +53,8 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
   // const credentialSubjects: ValidCredentialTypes[] = [];
   const credentialSubjects: CredentialData[] = [];
 
+  logger.info(`Issuing hyperverge credentials to user ${user.did}`);
+
   if (!user.did) {
     logger.error('User did not have a did. This should never happen.');
     throw new Error('User did not have a did');
@@ -85,6 +87,75 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
       address: user.hvAddress
     });
   }
+
+  if (user.hvDocCountry) {
+    credentialSubjects.push({
+      id: user.did,
+      type: 'CountryResidenceCredential',
+      country: user.hvDocCountry
+    });
+  }
+
+  if (user.hvDocType) {
+    credentialSubjects.push({
+      id: user.did,
+      type: 'GovernmentIdTypeCredential',
+      documentType: user.hvDocType
+    });
+  }
+
+  if (user.hvLiveFace) {
+    credentialSubjects.push({
+      id: user.did,
+      type: 'LivelinessCredential',
+      liveliness: user.hvLiveFace
+    });
+  }
+
+  if (user.hvLiveFaceConfidence) {
+    credentialSubjects.push({
+      id: user.did,
+      type: 'LivelinessConfidenceCredential',
+      confidence: user.hvLiveFaceConfidence
+    });
+  }
+
+  if (user.hvFaceMatch) {
+    credentialSubjects.push({
+      id: user.did,
+      type: 'FacialMatchCredential',
+      match: user.hvFaceMatch
+    });
+  }
+
+  if (user.hvFaceMatchConfidence) {
+    credentialSubjects.push({
+      id: user.did,
+      type: 'FacialMatchConfidenceCredential',
+      facialMatchConfidence: user.hvFaceMatchConfidence
+    });
+  }
+
+  /**
+   * Image credentials are commented out for now... WIP to support encryption of base64 images in server-sdk.
+   */
+  // if (user.hvDocImage) {
+  //   credentialSubjects.push({
+  //     id: user.did,
+  //     type: 'GovernmentIdDocumentImageCredential',
+  //     image: user.hvDocImage
+  //   });
+  // }
+
+  // if (user.hvFaceImage) {
+  //   credentialSubjects.push({
+  //     id: user.did,
+  //     type: 'FacialImageCredential',
+  //     image: user.hvFaceImage
+  //   });
+  // }
+
+  logger.debug(`Created ${credentialSubjects.length} credential subjects for hyperverge credentials for user ${user.did}`);
 
   const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, user.did as string, credentialSubjects);
 

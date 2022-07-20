@@ -1,15 +1,10 @@
 
-import { CredentialData, CredentialPb, CredentialRequest, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
+import { SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
 import { BadRequest } from '@feathersjs/errors';
 import { Hook } from '@feathersjs/feathers';
 import { getIssuerEntities } from '../hooks/getIssuerEntities';
 import { handleUserDidAssociation } from '../hooks/handleUserDidAssociation';
-import { validateCredentialRequest } from '../hooks/validateCredentialRequest';
 import logger from '../../logger';
-import { IssuerEntity } from '../../entities/Issuer';
-import { UnumDto, VerifiedStatus, verifySubjectCredentialRequests } from '@unumid/server-sdk';
-import { buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, issueCredentialsHelper } from '../../utils/issueCredentialsHelper';
-import { HookContext } from '../../app';
 
 const validateUserCredentialRequest: Hook = async (ctx) => {
   const data = ctx.data as SubjectCredentialRequestsEnrichedDto;
