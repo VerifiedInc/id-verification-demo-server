@@ -88,14 +88,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
     });
   }
 
-  // if (user.hvDocImage) {
-  //   credentialSubjects.push({
-  //     id: user.did,
-  //     type: 'GovernmentIdDocumentImageCredential',
-  //     image: user.hvDocImage
-  //   });
-  // }
-
   if (user.hvDocCountry) {
     credentialSubjects.push({
       id: user.did,
@@ -111,14 +103,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
       documentType: user.hvDocType
     });
   }
-
-  // if (user.hvFaceImage) {
-  //   credentialSubjects.push({
-  //     id: user.did,
-  //     type: 'FacialImageCredential',
-  //     image: user.hvFaceImage
-  //   });
-  // }
 
   if (user.hvLiveFace) {
     credentialSubjects.push({
@@ -151,6 +135,25 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
       facialMatchConfidence: user.hvFaceMatchConfidence
     });
   }
+
+  /**
+   * Image credentials are commented out for now... WIP to support encryption of base64 images in server-sdk.
+   */
+  // if (user.hvDocImage) {
+  //   credentialSubjects.push({
+  //     id: user.did,
+  //     type: 'GovernmentIdDocumentImageCredential',
+  //     image: user.hvDocImage
+  //   });
+  // }
+
+  // if (user.hvFaceImage) {
+  //   credentialSubjects.push({
+  //     id: user.did,
+  //     type: 'FacialImageCredential',
+  //     image: user.hvFaceImage
+  //   });
+  // }
 
   logger.debug(`Created ${credentialSubjects.length} credential subjects for hyperverge credentials for user ${user.did}`);
 
