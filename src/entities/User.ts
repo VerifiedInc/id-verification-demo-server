@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { Entity, Unique, Property, OneToMany, Collection } from '@mikro-orm/core';
 
 import { BaseEntity, BaseEntityOptions } from './BaseEntity';
+import { v4 } from 'uuid';
 
 export interface UserEntityOptions extends BaseEntityOptions {
   did?: string;
@@ -53,6 +54,7 @@ export class UserEntity extends BaseEntity {
     this.hvLiveFaceConfidence = options.hvLiveFaceConfidence;
     this.hvFaceMatch = options.hvFaceMatch;
     this.hvFaceMatchConfidence = options.hvFaceMatchConfidence;
+    this.userCode = v4();
   }
 
   @Property()

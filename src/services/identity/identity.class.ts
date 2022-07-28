@@ -1,6 +1,6 @@
 import { Params } from '@feathersjs/feathers';
 import { config } from '../../config';
-import { v4 as uuidv4, v4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Application, ProveServiceResponseV2 } from '../../declarations';
 import logger from '../../logger';
@@ -107,8 +107,7 @@ export class IdentityService {
     const userEntityOptions: UserEntityOptions = {
       proveDob: identityData.individual.dob,
       proveSsn: maskString(identityData.individual.ssn, 2),
-      provePhone: identityData.phoneNumber,
-      userCode: v4()
+      provePhone: identityData.phoneNumber
     };
 
     let userEntity;
