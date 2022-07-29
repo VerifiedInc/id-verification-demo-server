@@ -46,7 +46,8 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
       ...ctx,
       data: {
         ...ctx.data,
-        user
+        user,
+        credentialsIssuedByDidAssociation: []
       }
     };
   }
