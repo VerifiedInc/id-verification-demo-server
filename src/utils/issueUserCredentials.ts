@@ -132,7 +132,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
     credentialSubjects.push({
       id: user.did,
       type: 'FacialMatchConfidenceCredential',
-      facialMatchConfidence: user.hvFaceMatchConfidence
+      confidence: user.hvFaceMatchConfidence
     });
   }
 
