@@ -1,9 +1,8 @@
 import { UnumDto } from '@unumid/server-sdk';
-import { CredentialData, CredentialPb, CredentialSubject } from '@unumid/types';
+import { CredentialData, CredentialPb } from '@unumid/types';
 import { IssuerEntity } from '../entities/Issuer';
 import logger from '../logger';
 import { UserDto } from '../services/user/user.class';
-import { ValidCredentialTypes } from '../services/userCredentialRequests/userCredentialRequests.class';
 import { buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, issueCredentialsHelper } from './issueCredentialsHelper';
 
 // Handle issuing Prove credentials
@@ -16,15 +15,15 @@ export async function issueProveUserCredentials (user: UserDto, proveIssuer: Iss
   }
 
   if (user.proveDob) {
-    credentialSubjects.push(buildDobCredentialSubject(user.did as string, user.proveDob));
+    credentialSubjects.push(buildDobCredentialSubject(user.proveDob));
   }
 
   if (user.proveSsn) {
-    credentialSubjects.push(buildSsnCredentialSubject(user.did as string, user.proveSsn));
+    credentialSubjects.push(buildSsnCredentialSubject(user.proveSsn));
   }
 
   if (user.provePhone) {
-    credentialSubjects.push(buildPhoneCredentialSubject(user.did as string, user.provePhone));
+    credentialSubjects.push(buildPhoneCredentialSubject(user.provePhone));
   }
 
   if (user.proveFirstName) {
@@ -61,12 +60,11 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
   }
 
   if (user.hvDob) {
-    credentialSubjects.push(buildDobCredentialSubject(user.did as string, user.hvDob));
+    credentialSubjects.push(buildDobCredentialSubject(user.hvDob));
   }
 
   if (user.hvGender) {
     credentialSubjects.push({
-      id: user.did,
       type: 'GenderCredential',
       gender: user.hvGender
     });
@@ -74,7 +72,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   if (user.hvFullName) {
     credentialSubjects.push({
-      id: user.did,
       type: 'FullNameCredential',
       fullName: user.hvFullName
     });
@@ -82,7 +79,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   if (user.hvAddress) {
     credentialSubjects.push({
-      id: user.did,
       type: 'AddressCredential',
       address: user.hvAddress
     });
@@ -90,7 +86,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   if (user.hvDocCountry) {
     credentialSubjects.push({
-      id: user.did,
       type: 'CountryResidenceCredential',
       country: user.hvDocCountry
     });
@@ -98,7 +93,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   if (user.hvDocType) {
     credentialSubjects.push({
-      id: user.did,
       type: 'GovernmentIdTypeCredential',
       documentType: user.hvDocType
     });
@@ -106,7 +100,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   if (user.hvLiveFace) {
     credentialSubjects.push({
-      id: user.did,
       type: 'LivelinessCredential',
       liveliness: user.hvLiveFace
     });
@@ -114,7 +107,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   if (user.hvLiveFaceConfidence) {
     credentialSubjects.push({
-      id: user.did,
       type: 'LivelinessConfidenceCredential',
       confidence: user.hvLiveFaceConfidence
     });
@@ -122,7 +114,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   if (user.hvFaceMatch) {
     credentialSubjects.push({
-      id: user.did,
       type: 'FacialMatchCredential',
       match: user.hvFaceMatch
     });
@@ -130,7 +121,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   if (user.hvFaceMatchConfidence) {
     credentialSubjects.push({
-      id: user.did,
       type: 'FacialMatchConfidenceCredential',
       confidence: user.hvFaceMatchConfidence
     });
@@ -141,7 +131,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
    */
   // if (user.hvDocImage) {
   //   credentialSubjects.push({
-  //     id: user.did,
   //     type: 'GovernmentIdDocumentImageCredential',
   //     image: user.hvDocImage
   //   });
@@ -149,7 +138,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   // if (user.hvFaceImage) {
   //   credentialSubjects.push({
-  //     id: user.did,
   //     type: 'FacialImageCredential',
   //     image: user.hvFaceImage
   //   });
