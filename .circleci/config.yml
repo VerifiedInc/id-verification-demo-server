@@ -251,7 +251,7 @@ workflows:
       - deploy-image:
           name: deploy-image-test
           requires:
-            - build-and-push-image
+            - build-and-push-image-test
           context:
             - AWS-Dev
             - Slack-Context
