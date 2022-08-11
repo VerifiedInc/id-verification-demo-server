@@ -143,7 +143,6 @@ workflows:
             branches:
               ignore:
                 - main
-                - test-circleci
 
   build-and-deploy:
     jobs:
@@ -152,7 +151,6 @@ workflows:
             branches:
               only:
                 - main
-                - test-circleci
 
       - build-and-push-image:
           requires:
@@ -167,7 +165,6 @@ workflows:
             branches:
               only:
                 - main
-                - test-circleci
 
       - deploy-image:
           requires:
@@ -183,7 +180,6 @@ workflows:
             branches:
               only:
                 - main
-                - test-circleci
 
   build-and-deploy-sandbox:
     jobs:
@@ -229,4 +225,41 @@ workflows:
             branches:
               ignore: /.*/
 
+  build-and-deploy-test:
+    jobs:
+      - test:
+          filters:
+            branches:
+              only:
+                - test-circleci
 
+      - build-and-push-image:
+          name: build-and-push-image-test
+          requires:
+            - test
+          context:
+            - AWS-Dev
+            - Slack-Context
+          repo: id-verification-demo-server
+          image_tag_1: test-latest
+          image_tag_2: "${CIRCLE_BRANCH}-${CIRCLE_BUILD_NUM}"
+          filters:
+            branches:
+              only:
+                - test-circleci
+
+      - deploy-image:
+          name: deploy-image-test
+          requires:
+            - build-and-push-image
+          context:
+            - AWS-Dev
+            - Slack-Context
+          repo: id-verification-demo-server
+          deployment: id-verification-demo-server
+          cluster-name: "dev-customer-cluster"
+          image_tag: "test-latest"
+          filters:
+            branches:
+              only:
+                - test-circleci
