@@ -67,11 +67,11 @@ export class UserCredentialRequestsService {
     const credentialSubjects: CredentialData[] = [];
     subjectCredentialRequests.credentialRequests.forEach((credentialRequest: CredentialRequest) => {
       if (credentialRequest.type === 'DobCredential' && user.proveDob) {
-        credentialSubjects.push(buildDobCredentialSubject(userDid, user.proveDob));
+        credentialSubjects.push(buildDobCredentialSubject(user.proveDob));
       } else if (credentialRequest.type === 'SsnCredential' && user.proveSsn) {
-        credentialSubjects.push(buildSsnCredentialSubject(userDid, user.proveSsn));
+        credentialSubjects.push(buildSsnCredentialSubject(user.proveSsn));
       } else if (credentialRequest.type === 'PhoneCredential' && user.provePhone) {
-        credentialSubjects.push(buildPhoneCredentialSubject(userDid, user.provePhone));
+        credentialSubjects.push(buildPhoneCredentialSubject(user.provePhone));
       } else if (credentialRequest.type === 'FirstNameCredential' && user.proveFirstName) {
         credentialSubjects.push({ type: 'LastNameCredential', firstName: user.proveFirstName });
       } else if (credentialRequest.type === 'LastNameCredential' && user.proveLastName) {
@@ -133,7 +133,7 @@ export class UserCredentialRequestsService {
     const credentialSubjects: CredentialData[] = [];
     subjectCredentialRequests.credentialRequests.forEach((credentialRequest: CredentialRequest) => {
       if (credentialRequest.type === 'DobCredential' && user.hvDob) {
-        credentialSubjects.push(buildDobCredentialSubject(userDid, user.hvDob));
+        credentialSubjects.push(buildDobCredentialSubject(user.hvDob));
       } else if (credentialRequest.type === 'GenderCredential' && user.hvGender) {
         credentialSubjects.push({ type: 'GenderCredential', gender: user.hvGender });
       } else if (credentialRequest.type === 'FullNameCredential' && user.hvFullName) {
