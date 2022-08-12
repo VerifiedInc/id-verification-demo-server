@@ -1,7 +1,7 @@
 import { Application, Params, Service } from '@feathersjs/feathers';
 
 import { CredentialData, CredentialPb, SubjectCredentialRequests, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
-import { UnumDto, VerifiedStatus, verifySubjectCredentialRequests } from '@unumid/server-sdk';
+import { UnumDto, VerifiedStatus, verifySubjectCredentialRequests, reEncryptCredentials, extractCredentialType } from '@unumid/server-sdk';
 import { CredentialRequest } from '@unumid/types/build/protos/credential';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
@@ -9,6 +9,7 @@ import { UserDto } from '../user/user.class';
 import { buildAtomicCredentialData, buildAtomicCredentialSubject, buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, DobCredentialSubject, issueCredentialsHelper, PhoneCredentialSubject, SsnCredentialSubject } from '../../utils/issueCredentialsHelper';
 import { BadRequest } from '@feathersjs/errors';
 import _ from 'lodash';
+import { reEncryptCredentialsHelper } from '../../utils/reEncryptCredentialsHelper';
 
 export type ValidCredentialTypes = PhoneCredentialSubject | SsnCredentialSubject | DobCredentialSubject;
 
@@ -54,27 +55,47 @@ export class UserCredentialRequestsService {
       throw new Error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
     }
 
-    // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
-    const userDid = user.did as string;
+    const userDid = user.did as string; // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
+    const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
 
     /**
-     * Now that we have verified the credential requests signature signed by the subject, aka user, and we
-     * have confirmed to have a user with the matching did in our data store, we need some logic to determine if we can
-     * issue the requested credentials.
+     * At this point we have verified the credential requests signature signed by the subject, aka user, and we
+     * have confirmed to have a user with the matching did in our data store. Now we need to handle issue credentials to the user.
+     * for this have have a couple options:
      *
-     * For demonstration purposes just simply full-filling email, kyc and auth credential requests.
+     * a) if we are persisting the credential data along side the User entity in our database then we should double check if have those
+     * values which would correspond to the requested credentials then issue the credentials.
+     *
+     * b) if we are not persisting credential data in our database and we use the default issueCredentials call to issue the credentials originally then we can just use the SDK's reEncryptCredentials.
+     *
+     * Note: The option to use reEncryptCredentials is valid even if we are persisting credential data in our database. In fact, we are showcasing that in handleHvCredentials.
+     */
+
+    // /**
+    //  * Using the server SDK's re-encryption helper to handle the re-encryption of the credentials for target user.
+    //  * This made possible by using the default issuerCredentials call which makes a copy of the user credentials available to the issuer keys.
+    //  * The benefit of this default is the Issuer do *not* have to store the user's credentials in the their (this demo's) data store.
+    //  *
+    //  * Note: this corresponds to option b) above even though we are persisting the data on the user entity.
+    //  */
+    // const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await reEncryptCredentialsHelper(hvIssuer, userDid, credentialTypesRequested);
+
+    /**
+     * We need some logic to determine if we have the data related to the user to issue the requested credentials.
+     *
+     * Note: this check then calling issueCredentials corresponds to option a) above
      */
     const credentialSubjects: CredentialData[] = [];
-    subjectCredentialRequests.credentialRequests.forEach((credentialRequest: CredentialRequest) => {
-      if (credentialRequest.type === 'DobCredential' && user.proveDob) {
+    credentialTypesRequested.forEach((type: string) => {
+      if (type === 'DobCredential' && user.proveDob) {
         credentialSubjects.push(buildDobCredentialSubject(user.proveDob));
-      } else if (credentialRequest.type === 'SsnCredential' && user.proveSsn) {
+      } else if (type === 'SsnCredential' && user.proveSsn) {
         credentialSubjects.push(buildSsnCredentialSubject(user.proveSsn));
-      } else if (credentialRequest.type === 'PhoneCredential' && user.provePhone) {
+      } else if (type === 'PhoneCredential' && user.provePhone) {
         credentialSubjects.push(buildPhoneCredentialSubject(user.provePhone));
-      } else if (credentialRequest.type === 'FirstNameCredential' && user.proveFirstName) {
+      } else if (type === 'FirstNameCredential' && user.proveFirstName) {
         credentialSubjects.push({ type: 'LastNameCredential', firstName: user.proveFirstName });
-      } else if (credentialRequest.type === 'LastNameCredential' && user.proveLastName) {
+      } else if (type === 'LastNameCredential' && user.proveLastName) {
         credentialSubjects.push({ type: 'LastNameCredential', lastName: user.proveLastName });
       }
     });
@@ -120,46 +141,66 @@ export class UserCredentialRequestsService {
       throw new Error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
     }
 
-    // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
-    const userDid = user.did as string;
+    const userDid = user.did as string; // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
+    const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
 
     /**
-     * Now that we have verified the credential requests signature signed by the subject, aka user, and we
-     * have confirmed to have a user with the matching did in our data store, we need some logic to determine if we can
-     * issue the requested credentials.
+     * At this point we have verified the credential requests signature signed by the subject, aka user, and we
+     * have confirmed to have a user with the matching did in our data store. Now we need to handle issue credentials to the user.
+     * for this have have a couple options:
      *
-     * For demonstration purposes just simply full-filling email, kyc and auth credential requests.
+     * a) if we are persisting the credential data along side the User entity in our (this demo's) database then we should double check if have those
+     * values which would correspond to the requested credentials then issue the credentials.
+     *
+     * b) if we are not persisting credential data in our database and we use the default issueCredentials call to issue the credentials originally then we can just use the SDK's reEncryptCredentials.
+     *
+     * Note: The option to use reEncryptCredentials is valid even if we are persisting credential data in our database. In fact, that is what are going to do here.
      */
-    const credentialSubjects: CredentialData[] = [];
-    subjectCredentialRequests.credentialRequests.forEach((credentialRequest: CredentialRequest) => {
-      if (credentialRequest.type === 'DobCredential' && user.hvDob) {
-        credentialSubjects.push(buildDobCredentialSubject(user.hvDob));
-      } else if (credentialRequest.type === 'GenderCredential' && user.hvGender) {
-        credentialSubjects.push({ type: 'GenderCredential', gender: user.hvGender });
-      } else if (credentialRequest.type === 'FullNameCredential' && user.hvFullName) {
-        credentialSubjects.push({ type: 'FullNameCredential', fullName: user.hvFullName });
-      } else if (credentialRequest.type === 'AddressCredential' && user.hvAddress) {
-        credentialSubjects.push({ type: 'AddressCredential', address: user.hvAddress });
-      } else if (credentialRequest.type === 'GovernmentIdDocumentImageCredential' && user.hvDocImage) {
-        credentialSubjects.push({ type: 'GovernmentIdDocumentImageCredential', image: user.hvDocImage });
-      } else if (credentialRequest.type === 'CountryResidenceCredential' && user.hvDocCountry) {
-        credentialSubjects.push({ type: 'CountryResidenceCredential', country: user.hvDocCountry });
-      } else if (credentialRequest.type === 'GovernmentIdTypeCredential' && user.hvDocType) {
-        credentialSubjects.push({ type: 'GovernmentIdTypeCredential', documentType: user.hvDocType });
-      } else if (credentialRequest.type === 'FacialImageCredential' && user.hvFaceImage) {
-        credentialSubjects.push({ type: 'FacialImageCredential', image: user.hvFaceImage });
-      } else if (credentialRequest.type === 'LivelinessCredential' && user.hvLiveFace) {
-        credentialSubjects.push({ type: 'LivelinessCredential', liveliness: user.hvLiveFace });
-      } else if (credentialRequest.type === 'LivelinessConfidenceCredential' && user.hvLiveFaceConfidence) {
-        credentialSubjects.push({ type: 'LivelinessConfidenceCredential', confidence: user.hvLiveFaceConfidence });
-      } else if (credentialRequest.type === 'FacialMatchCredential' && user.hvFaceMatch) {
-        credentialSubjects.push({ type: 'FacialMatchCredential', match: user.hvFaceMatch });
-      } else if (credentialRequest.type === 'FacialMatchConfidenceCredential' && user.hvFaceMatchConfidence) {
-        credentialSubjects.push({ type: 'FacialMatchConfidenceCredential', confidence: user.hvFaceMatchConfidence });
-      }
-    });
 
-    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, userDid, credentialSubjects);
+    /**
+     * Using the server SDK's re-encryption helper to handle the re-encryption of the credentials for target user.
+     * This made possible by using the default issuerCredentials call which makes a copy of the user credentials available to the issuer keys.
+     * The benefit of this default is the Issuer do *not* have to store the user's credentials in the their (this demo's) data store.
+     *
+     * Note: this corresponds to option b) above even though we are persisting the data on the user entity.
+     */
+    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await reEncryptCredentialsHelper(hvIssuer, userDid, credentialTypesRequested);
+
+    // /**
+    //  * We need some logic to determine if we have the data related to the user to issue the requested credentials.
+    //  *
+    //  * Note: this corresponds to option a) above.
+    //  */
+    // const credentialSubjects: CredentialData[] = [];
+    // credentialTypesRequested.forEach((type: string) => {
+    //   if (type === 'DobCredential' && user.hvDob) {
+    //     credentialSubjects.push(buildDobCredentialSubject(user.hvDob));
+    //   } else if (type === 'GenderCredential' && user.hvGender) {
+    //     credentialSubjects.push({ type: 'GenderCredential', gender: user.hvGender });
+    //   } else if (type === 'FullNameCredential' && user.hvFullName) {
+    //     credentialSubjects.push({ type: 'FullNameCredential', fullName: user.hvFullName });
+    //   } else if (type === 'AddressCredential' && user.hvAddress) {
+    //     credentialSubjects.push({ type: 'AddressCredential', address: user.hvAddress });
+    //   } else if (type === 'GovernmentIdDocumentImageCredential' && user.hvDocImage) {
+    //     credentialSubjects.push({ type: 'GovernmentIdDocumentImageCredential', image: user.hvDocImage });
+    //   } else if (type === 'CountryResidenceCredential' && user.hvDocCountry) {
+    //     credentialSubjects.push({ type: 'CountryResidenceCredential', country: user.hvDocCountry });
+    //   } else if (type === 'GovernmentIdTypeCredential' && user.hvDocType) {
+    //     credentialSubjects.push({ type: 'GovernmentIdTypeCredential', documentType: user.hvDocType });
+    //   } else if (type === 'FacialImageCredential' && user.hvFaceImage) {
+    //     credentialSubjects.push({ type: 'FacialImageCredential', image: user.hvFaceImage });
+    //   } else if (type === 'LivelinessCredential' && user.hvLiveFace) {
+    //     credentialSubjects.push({ type: 'LivelinessCredential', liveliness: user.hvLiveFace });
+    //   } else if (type === 'LivelinessConfidenceCredential' && user.hvLiveFaceConfidence) {
+    //     credentialSubjects.push({ type: 'LivelinessConfidenceCredential', confidence: user.hvLiveFaceConfidence });
+    //   } else if (type === 'FacialMatchCredential' && user.hvFaceMatch) {
+    //     credentialSubjects.push({ type: 'FacialMatchCredential', match: user.hvFaceMatch });
+    //   } else if (type === 'FacialMatchConfidenceCredential' && user.hvFaceMatchConfidence) {
+    //     credentialSubjects.push({ type: 'FacialMatchConfidenceCredential', confidence: user.hvFaceMatchConfidence });
+    //   }
+    // });
+
+    // const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, userDid, credentialSubjects);
 
     // update the default issuer's auth token if it has been reissued
     if (unumDtoCredentialsIssuedResponse.authToken !== hvIssuer.authToken) {
@@ -173,7 +214,8 @@ export class UserCredentialRequestsService {
     }
 
     return {
-      credentialTypesIssued: credentialSubjects.map((credentialSubject: CredentialData) => credentialSubject.type)
+      // credentialTypesIssued: credentialSubjects.map((credentialSubject: CredentialData) => credentialSubject.type)
+      credentialTypesIssued: unumDtoCredentialsIssuedResponse.body.flatMap((credential: CredentialPb) => extractCredentialType(credential.type))
     };
   }
 
