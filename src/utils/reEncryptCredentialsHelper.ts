@@ -21,8 +21,8 @@ export const reEncryptCredentialsHelper = async (
       did,
       signingPrivateKey,
       encryptionPrivateKey,
-      userDid,
       encryptionKeyId,
+      userDid,
       credentialTypes
     );
 
