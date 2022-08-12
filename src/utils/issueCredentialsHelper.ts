@@ -39,23 +39,23 @@ export interface GenderCredentialSchema extends CredentialData {
 
 export const issueCredentialsHelper = async (
   issuerEntity: IssuerEntity,
-  credentialSubject: string,
+  userDid: string,
   credentialDataList: CredentialData[]
 ): Promise<UnumDto<CredentialPb[]>> => {
-  let authCredentialResponse;
+  let unumDtoCredentialResponse;
 
   try {
     logger.debug(`Calling issuerCredentials with date list: ${JSON.stringify(credentialDataList)}`);
 
-    authCredentialResponse = await issueCredentials(
+    unumDtoCredentialResponse = await issueCredentials(
       formatBearerToken(issuerEntity.authToken),
       issuerEntity.did,
-      credentialSubject,
+      userDid,
       credentialDataList,
       issuerEntity.signingPrivateKey
     );
 
-    return authCredentialResponse as UnumDto<CredentialPb[]>;
+    return unumDtoCredentialResponse as UnumDto<CredentialPb[]>;
   } catch (e) {
     logger.error(`issueCredentials caught an error thrown by the server sdk. ${e}`);
     throw e;

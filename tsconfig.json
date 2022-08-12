@@ -8,6 +8,8 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "sourceMap": true,
+    // "inlineSourceMap": true,
+    "inlineSources": true,
     "declaration": true
   },
   "exclude": [
