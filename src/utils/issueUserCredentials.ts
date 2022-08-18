@@ -84,20 +84,6 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
     });
   }
 
-  if (user.hvDocCountry) {
-    credentialSubjects.push({
-      type: 'CountryResidenceCredential',
-      country: user.hvDocCountry
-    });
-  }
-
-  if (user.hvDocType) {
-    credentialSubjects.push({
-      type: 'GovernmentIdTypeCredential',
-      documentType: user.hvDocType
-    });
-  }
-
   if (user.hvLiveFace) {
     credentialSubjects.push({
       type: 'LivelinessCredential',
@@ -105,26 +91,43 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
     });
   }
 
-  if (user.hvLiveFaceConfidence) {
-    credentialSubjects.push({
-      type: 'LivelinessConfidenceCredential',
-      confidence: user.hvLiveFaceConfidence
-    });
-  }
+  /**
+   * Not issuing this credentials types to limit number of credentials issued until can be made more efficient in the Server SDK
+   */
+  // if (user.hvDocCountry) {
+  //   credentialSubjects.push({
+  //     type: 'CountryResidenceCredential',
+  //     country: user.hvDocCountry
+  //   });
+  // }
 
-  if (user.hvFaceMatch) {
-    credentialSubjects.push({
-      type: 'FacialMatchCredential',
-      match: user.hvFaceMatch
-    });
-  }
+  // if (user.hvDocType) {
+  //   credentialSubjects.push({
+  //     type: 'GovernmentIdTypeCredential',
+  //     documentType: user.hvDocType
+  //   });
+  // }
 
-  if (user.hvFaceMatchConfidence) {
-    credentialSubjects.push({
-      type: 'FacialMatchConfidenceCredential',
-      confidence: user.hvFaceMatchConfidence
-    });
-  }
+  // if (user.hvLiveFaceConfidence) {
+  //   credentialSubjects.push({
+  //     type: 'LivelinessConfidenceCredential',
+  //     confidence: user.hvLiveFaceConfidence
+  //   });
+  // }
+
+  // if (user.hvFaceMatch) {
+  //   credentialSubjects.push({
+  //     type: 'FacialMatchCredential',
+  //     match: user.hvFaceMatch
+  //   });
+  // }
+
+  // if (user.hvFaceMatchConfidence) {
+  //   credentialSubjects.push({
+  //     type: 'FacialMatchConfidenceCredential',
+  //     confidence: user.hvFaceMatchConfidence
+  //   });
+  // }
 
   /**
    * Image credentials are commented out for now... WIP to support encryption of base64 images in server-sdk.
