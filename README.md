@@ -1,5 +1,5 @@
 # Identity Verification Demo Server
-> This project acts as the backend for a fictional customer that collects information about a user during onboarding then wants to issue Unum ID credentials to them. Using the Unum ID [Wallet](https://wallet.unumid.co/) the user is in full control of sharing this information.
+> This project acts as the backend for a fictional customer that collects information about a user during onboarding then issues Unum ID credentials to them. Using the Unum ID [Wallet](https://wallet.unumid.co/) the user is in full control of sharing this information.
 
 Information about the Unum ID demo ecosystem can be found in our [documentation](https://docs.unumid.co/#demos).
 
