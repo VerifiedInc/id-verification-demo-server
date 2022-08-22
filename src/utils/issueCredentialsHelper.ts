@@ -42,7 +42,7 @@ export const issueCredentialsHelper = async (
   userDid: string,
   credentialDataList: CredentialData[]
 ): Promise<UnumDto<CredentialPb[]>> => {
-  let unumDtoCredentialResponse;
+  let unumDtoCredentialResponse: UnumDto<CredentialPb[]>;
 
   try {
     logger.debug(`Calling issuerCredentials with date list: ${JSON.stringify(credentialDataList)}`);
@@ -53,9 +53,9 @@ export const issueCredentialsHelper = async (
       userDid,
       credentialDataList,
       issuerEntity.signingPrivateKey
-    );
+    ) as UnumDto<CredentialPb[]>;
 
-    return unumDtoCredentialResponse as UnumDto<CredentialPb[]>;
+    return unumDtoCredentialResponse;
   } catch (e) {
     logger.error(`issueCredentials caught an error thrown by the server sdk. ${e}`);
     throw e;

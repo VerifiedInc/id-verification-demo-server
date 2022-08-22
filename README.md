@@ -1,9 +1,9 @@
 # Identity Verification Demo Server
-> This project acts as the backend for a fictional customer that collects information about a user during onboarding then wants to issue Unum ID credentials to them. Using the Unum ID [Wallet](https://wallet.unumid.co/) the user is in full control of sharing this information.
+> This project acts as the backend for a fictional customer that collects information about a user during onboarding then issues Unum ID credentials to them. Using the Unum ID [Wallet](https://wallet.unumid.co/) the user is in full control of sharing this information.
 
 Information about the Unum ID demo ecosystem can be found in our [documentation](https://docs.unumid.co/#demos).
 
-This demo specifically acts as an [Issuer](https://docs.unumid.co/terminology/#issuer) in the Unum ID ecosystem while Acme as seen in the ID Verification [Client](https://github.com/UnumID/id-verification-demo-client)'s `/request` path acts as a [Verifier](https://docs.unumid.co/terminology/#verifier). It is worth noting while this demo interfaces with Acme, the source code for the ACME demo verifier lives in another demo [repository](https://github.com/UnumID/acme-demo-verifier-server).
+This demo specifically acts as an [Issuer](https://docs.unumid.co/terminology/#issuer) in the Unum ID ecosystem while Acme as seen in the ID Verification [Client](https://github.com/UnumID/id-verification-demo-client)'s `/request` path acts as a [Verifier](https://docs.unumid.co/terminology/#verifier). It is worth noting while this demo interfaces with our ACME verifier server demo to act as a third party and show off the [Sharified Identity](https://www.unumid.co/solutions/sharified-identity) capabilities. The source code for the ACME demo verifier lives in another demo [repository](https://github.com/UnumID/acme-demo-verifier-server).
 
 ## Integration Source Code Examples
 Per Server SDK's quick start [guide](https://docs.unumid.co/quick-start-guide#server-sdk) and outlined in more detail in the Server SDK's[deployment overview](https://docs.unumid.co/deployment-overview#server-sdk) this project shows a concrete implementation of the required `/userCredentialRequests` endpoint as defined by the OpenApi [spec](https://gist.github.com/UnumIDMachine/146a0a428c683b756efd8240b31a4678).
