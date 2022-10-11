@@ -217,7 +217,7 @@ workflows:
           deployment: id-verification-demo-server
           cluster-name: "sandbox-customer-cluster"
           image_tag: "${CIRCLE_TAG}"
-          namespace: demos
+          namespace: default
           slack_pass_notify_template: success_tagged_deploy_1
           filters:
             tags:
