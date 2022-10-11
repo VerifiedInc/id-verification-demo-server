@@ -87,7 +87,8 @@ export class HyperVergeService {
       const userEntity = await this.userEntityService.create(userEntityOptions, params);
 
       return {
-        userCode: userEntity.userCode as string
+        userCode: userEntity.userCode as string,
+        dob: userEntity.hvDob as string
       };
     } catch (e) {
       logger.error(`Error hitting HV results api: ${e}`);
