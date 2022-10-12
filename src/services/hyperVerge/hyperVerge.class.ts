@@ -32,7 +32,7 @@ export class HyperVergeService {
         baseUrl: 'https://ind.idv.hyperverge.co',
         endPoint: '/v1/link-kyc/results',
         data: {
-          transactionId: data.transactionId
+          transactionId
         },
         header: {
           appId: config.HYPER_VERGE_APP_ID,
@@ -75,7 +75,7 @@ export class HyperVergeService {
 
       // need to store the data until the user has a did to issue credentials to
       const userEntityOptions: UserEntityOptions = {
-        userCode: v4(),
+        userCode: transactionId,
         hvDob: dob,
         hvFullName: fullName,
         hvAddress: address,
