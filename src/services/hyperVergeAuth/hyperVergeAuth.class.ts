@@ -29,7 +29,7 @@ export class HyperVergeAuth {
       data: {
         appId: config.HYPER_VERGE_APP_ID,
         appKey: config.HYPER_VERGE_APP_KEY,
-        expiry: 30000
+        expiry: 300
       }
     };
 
