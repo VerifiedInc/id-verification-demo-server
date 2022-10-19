@@ -2,6 +2,7 @@ import { Application, Params, Service } from '@feathersjs/feathers';
 
 import { CredentialData, CredentialPb, SubjectCredentialRequests, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
 import { UnumDto, VerifiedStatus, verifySubjectCredentialRequests, reEncryptCredentials, extractCredentialType } from '@unumid/server-sdk';
+import { verifySubjectCredentialRequests as verifySubjectCredentialRequestsV3 } from '@unumid/server-sdk-v3';
 import { CredentialRequest } from '@unumid/types/build/protos/credential';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
@@ -49,7 +50,10 @@ export class UserCredentialRequestsService {
       throw new Error(`Persisted Issuer DID ${proveIssuer.did} does not match request's issuer did ${issuerDid}`);
     }
 
-    const verification: UnumDto<VerifiedStatus> = await verifySubjectCredentialRequests(proveIssuer.authToken, proveIssuer.did, subjectDid, subjectCredentialRequests);
+    // handle SDK backwards compatibility
+    const verification: UnumDto<VerifiedStatus> = version === '1.0.0'
+      ? await verifySubjectCredentialRequestsV3(proveIssuer.authToken, proveIssuer.did, subjectDid, subjectCredentialRequests)
+      : await verifySubjectCredentialRequests(proveIssuer.authToken, proveIssuer.did, subjectDid, subjectCredentialRequests);
 
     if (!verification.body.isVerified) {
       logger.error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);

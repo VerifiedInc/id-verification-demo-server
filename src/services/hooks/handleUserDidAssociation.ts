@@ -1,6 +1,7 @@
 import { BadRequest } from '@feathersjs/errors';
 import { Hook } from '@feathersjs/feathers';
 import { revokeAllCredentials, UnumDto, VerifiedStatus, verifySignedDid } from '@unumid/server-sdk';
+import { verifySignedDid as verifySignedDidV3 } from '@unumid/server-sdk-v3';
 import { CredentialPb, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
@@ -67,8 +68,9 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     throw e;
   }
 
+  // handle sdk v3 backwards compatibility
   // verify the subject did document; issuer.did is strictly for receipt / audit log entry creation
-  const result: UnumDto<VerifiedStatus> = await verifySignedDid(proveIssuerEntity.authToken, proveIssuerEntity.did, did);
+  const result: UnumDto<VerifiedStatus> = version === '1.0.0' ? await verifySignedDidV3(proveIssuerEntity.authToken, proveIssuerEntity.did, did) : await verifySignedDid(proveIssuerEntity.authToken, proveIssuerEntity.did, did);
 
   if (!result.body.isVerified) {
     throw new Error(`${result.body.message} Subject DID document ${did.id} for user ${userCode} is not verified.`);
