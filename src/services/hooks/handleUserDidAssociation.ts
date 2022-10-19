@@ -17,6 +17,8 @@ import { UserDto } from '../user/user.class';
 export const handleUserDidAssociation: Hook = async (ctx) => {
   const { app, params } = ctx;
 
+  const version = params.headers?.version; // ought to be confirmed present in the before hook
+
   // need to get an existing user either by the userIdentifier or by the subjectDid
   const userEntityService = app.service('userEntity');
   let user: UserDto;
@@ -98,7 +100,7 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     user = await userEntityService.patch(user.uuid, { did: userDid, userCode: null });
 
     // now that the user has a DID we can issue Prove credentials for the user
-    const proveIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueProveUserCredentials(user, proveIssuerEntity);
+    const proveIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueProveUserCredentials(user, proveIssuerEntity, version);
 
     // add the credentials to result list for the response body
     credentialsIssued.push(...proveIssuedCredentialDto.body);
@@ -115,7 +117,7 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     }
 
     // now that the user has a DID we can issue HV credentials for the user
-    const hvIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueHvUserCredentials(user, hvIssuerEntity);
+    const hvIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueHvUserCredentials(user, hvIssuerEntity, version);
 
     // add the credentials to result list for the response body
     credentialsIssued.push(...hvIssuedCredentialDto.body);
