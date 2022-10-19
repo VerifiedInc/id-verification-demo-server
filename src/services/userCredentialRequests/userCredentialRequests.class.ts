@@ -34,6 +34,7 @@ export class UserCredentialRequestsService {
 
   private async handleProveCredentials (data: UserCredentialRequests, params?: Params): Promise<CredentialsIssuedResponse> {
     const proveIssuer: IssuerEntity = params?.proveIssuerEntity;
+    const version = params?.headers?.version; // confirmed present in the before hook
 
     if (!data.credentialRequestsInfo) {
       // short circuit as no requests for credentials
@@ -100,7 +101,7 @@ export class UserCredentialRequestsService {
       }
     });
 
-    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(proveIssuer, userDid, credentialSubjects);
+    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(proveIssuer, userDid, credentialSubjects, version);
 
     // update the default issuer's auth token if it has been reissued
     if (unumDtoCredentialsIssuedResponse.authToken !== proveIssuer.authToken) {

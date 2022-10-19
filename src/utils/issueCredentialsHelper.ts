@@ -1,4 +1,5 @@
 import { issueCredentials, UnumDto } from '@unumid/server-sdk';
+import { issueCredentials as issueCredentialsV3 } from '@unumid/server-sdk-v3';
 import { CredentialData, CredentialPb, CredentialSubject } from '@unumid/types';
 import { IssuerEntity } from '../entities/Issuer';
 import logger from '../logger';
@@ -40,20 +41,31 @@ export interface GenderCredentialSchema extends CredentialData {
 export const issueCredentialsHelper = async (
   issuerEntity: IssuerEntity,
   userDid: string,
-  credentialDataList: CredentialData[]
+  credentialDataList: CredentialData[],
+  version: string
 ): Promise<UnumDto<CredentialPb[]>> => {
   let unumDtoCredentialResponse: UnumDto<CredentialPb[]>;
 
   try {
     logger.debug(`Calling issuerCredentials with date list: ${JSON.stringify(credentialDataList)}`);
 
-    unumDtoCredentialResponse = await issueCredentials(
-      formatBearerToken(issuerEntity.authToken),
-      issuerEntity.did,
-      userDid,
-      credentialDataList,
-      issuerEntity.signingPrivateKey
-    ) as UnumDto<CredentialPb[]>;
+    if (version === '1.0.0') {
+      unumDtoCredentialResponse = await issueCredentialsV3(
+        formatBearerToken(issuerEntity.authToken),
+        issuerEntity.did,
+        userDid,
+        credentialDataList,
+        issuerEntity.signingPrivateKey
+      ) as UnumDto<CredentialPb[]>;
+    } else {
+      unumDtoCredentialResponse = await issueCredentials(
+        formatBearerToken(issuerEntity.authToken),
+        issuerEntity.did,
+        userDid,
+        credentialDataList,
+        issuerEntity.signingPrivateKey
+      ) as UnumDto<CredentialPb[]>;
+    }
 
     return unumDtoCredentialResponse;
   } catch (e) {
