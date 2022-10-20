@@ -91,60 +91,57 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
     });
   }
 
-  /**
-   * Not issuing this credentials types to limit number of credentials issued until can be made more efficient in the Server SDK
-   */
-  // if (user.hvDocCountry) {
-  //   credentialSubjects.push({
-  //     type: 'CountryResidenceCredential',
-  //     country: user.hvDocCountry
-  //   });
-  // }
+  if (user.hvDocCountry) {
+    credentialSubjects.push({
+      type: 'CountryResidenceCredential',
+      country: user.hvDocCountry
+    });
+  }
 
-  // if (user.hvDocType) {
-  //   credentialSubjects.push({
-  //     type: 'GovernmentIdTypeCredential',
-  //     documentType: user.hvDocType
-  //   });
-  // }
+  if (user.hvDocType) {
+    credentialSubjects.push({
+      type: 'GovernmentIdTypeCredential',
+      documentType: user.hvDocType
+    });
+  }
 
-  // if (user.hvLiveFaceConfidence) {
-  //   credentialSubjects.push({
-  //     type: 'LivelinessConfidenceCredential',
-  //     confidence: user.hvLiveFaceConfidence
-  //   });
-  // }
+  if (user.hvLiveFaceConfidence) {
+    credentialSubjects.push({
+      type: 'LivelinessConfidenceCredential',
+      confidence: user.hvLiveFaceConfidence
+    });
+  }
 
-  // if (user.hvFaceMatch) {
-  //   credentialSubjects.push({
-  //     type: 'FacialMatchCredential',
-  //     match: user.hvFaceMatch
-  //   });
-  // }
+  if (user.hvFaceMatch) {
+    credentialSubjects.push({
+      type: 'FacialMatchCredential',
+      match: user.hvFaceMatch
+    });
+  }
 
-  // if (user.hvFaceMatchConfidence) {
-  //   credentialSubjects.push({
-  //     type: 'FacialMatchConfidenceCredential',
-  //     confidence: user.hvFaceMatchConfidence
-  //   });
-  // }
+  if (user.hvFaceMatchConfidence) {
+    credentialSubjects.push({
+      type: 'FacialMatchConfidenceCredential',
+      confidence: user.hvFaceMatchConfidence
+    });
+  }
 
   /**
-   * Image credentials are commented out for now... WIP to support encryption of base64 images in server-sdk.
+   * Image credentials
    */
-  // if (user.hvDocImage) {
-  //   credentialSubjects.push({
-  //     type: 'GovernmentIdDocumentImageCredential',
-  //     image: user.hvDocImage
-  //   });
-  // }
+  if (user.hvDocImage) {
+    credentialSubjects.push({
+      type: 'GovernmentIdDocumentImageCredential',
+      image: user.hvDocImage
+    });
+  }
 
-  // if (user.hvFaceImage) {
-  //   credentialSubjects.push({
-  //     type: 'FacialImageCredential',
-  //     image: user.hvFaceImage
-  //   });
-  // }
+  if (user.hvFaceImage) {
+    credentialSubjects.push({
+      type: 'FacialImageCredential',
+      image: user.hvFaceImage
+    });
+  }
 
   logger.debug(`Created ${credentialSubjects.length} credential subjects for hyperverge credentials for user ${user.did}`);
 
