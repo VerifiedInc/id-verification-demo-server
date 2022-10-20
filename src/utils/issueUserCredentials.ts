@@ -6,7 +6,7 @@ import { UserDto } from '../services/user/user.class';
 import { buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, issueCredentialsHelper } from './issueCredentialsHelper';
 
 // Handle issuing Prove credentials
-export async function issueProveUserCredentials (user: UserDto, proveIssuer: IssuerEntity): Promise<UnumDto<CredentialPb[]>> {
+export async function issueProveUserCredentials (user: UserDto, proveIssuer: IssuerEntity, version: string): Promise<UnumDto<CredentialPb[]>> {
   const credentialSubjects: CredentialData[] = [];
 
   if (!user.did) {
@@ -42,13 +42,13 @@ export async function issueProveUserCredentials (user: UserDto, proveIssuer: Iss
     });
   }
 
-  const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(proveIssuer, user.did as string, credentialSubjects);
+  const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(proveIssuer, user.did as string, credentialSubjects, version);
 
   return unumDtoCredentialsIssuedResponse;
 }
 
 // Handle issuing Prove credentials
-export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEntity): Promise<UnumDto<CredentialPb[]>> {
+export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEntity, version: string): Promise<UnumDto<CredentialPb[]>> {
   // const credentialSubjects: ValidCredentialTypes[] = [];
   const credentialSubjects: CredentialData[] = [];
 
@@ -148,7 +148,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   logger.debug(`Created ${credentialSubjects.length} credential subjects for hyperverge credentials for user ${user.did}`);
 
-  const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, user.did as string, credentialSubjects);
+  const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, user.did as string, credentialSubjects, version);
 
   return unumDtoCredentialsIssuedResponse;
 }

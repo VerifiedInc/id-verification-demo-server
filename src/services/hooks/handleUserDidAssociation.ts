@@ -1,6 +1,7 @@
 import { BadRequest } from '@feathersjs/errors';
 import { Hook } from '@feathersjs/feathers';
 import { revokeAllCredentials, UnumDto, VerifiedStatus, verifySignedDid } from '@unumid/server-sdk';
+import { verifySignedDid as verifySignedDidV3 } from '@unumid/server-sdk-v3';
 import { CredentialPb, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
@@ -16,6 +17,8 @@ import { UserDto } from '../user/user.class';
  */
 export const handleUserDidAssociation: Hook = async (ctx) => {
   const { app, params } = ctx;
+
+  const version = params.headers?.version; // ought to be confirmed present in the before hook
 
   // need to get an existing user either by the userIdentifier or by the subjectDid
   const userEntityService = app.service('userEntity');
@@ -65,8 +68,9 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     throw e;
   }
 
+  // handle sdk v3 backwards compatibility
   // verify the subject did document; issuer.did is strictly for receipt / audit log entry creation
-  const result: UnumDto<VerifiedStatus> = await verifySignedDid(proveIssuerEntity.authToken, proveIssuerEntity.did, did);
+  const result: UnumDto<VerifiedStatus> = version === '1.0.0' ? await verifySignedDidV3(proveIssuerEntity.authToken, proveIssuerEntity.did, did) : await verifySignedDid(proveIssuerEntity.authToken, proveIssuerEntity.did, did);
 
   if (!result.body.isVerified) {
     throw new Error(`${result.body.message} Subject DID document ${did.id} for user ${userCode} is not verified.`);
@@ -98,7 +102,7 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     user = await userEntityService.patch(user.uuid, { did: userDid, userCode: null });
 
     // now that the user has a DID we can issue Prove credentials for the user
-    const proveIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueProveUserCredentials(user, proveIssuerEntity);
+    const proveIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueProveUserCredentials(user, proveIssuerEntity, version);
 
     // add the credentials to result list for the response body
     credentialsIssued.push(...proveIssuedCredentialDto.body);
@@ -115,7 +119,7 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     }
 
     // now that the user has a DID we can issue HV credentials for the user
-    const hvIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueHvUserCredentials(user, hvIssuerEntity);
+    const hvIssuedCredentialDto: UnumDto<CredentialPb[]> = await issueHvUserCredentials(user, hvIssuerEntity, version);
 
     // add the credentials to result list for the response body
     credentialsIssued.push(...hvIssuedCredentialDto.body);
