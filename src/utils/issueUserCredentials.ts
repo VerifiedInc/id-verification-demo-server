@@ -147,5 +147,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, user.did as string, credentialSubjects, version);
 
+  logger.info(`Successfully issued ${unumDtoCredentialsIssuedResponse.body.length} hyperverge credentials to user ${user.did}`);
+
   return unumDtoCredentialsIssuedResponse;
 }
