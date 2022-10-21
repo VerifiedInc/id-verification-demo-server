@@ -17,8 +17,8 @@ export interface UserEntityOptions extends BaseEntityOptions {
   hvFullName?: string;
   hvAddress?: string;
 
-  hvDocImage?: string; // base64
-  hvFaceImage?: string; // base64
+  hvDocImage?: string; // url or base64... hv is not returning as a url
+  hvFaceImage?: string; // url or base64... hv is not returning as a url
   hvDocCountry?: string; // i.e. 'usa'
   hvDocType?: string; // i.e. 'dl'
   hvLiveFace?: string;

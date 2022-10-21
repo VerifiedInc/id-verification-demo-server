@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { Application } from '../../declarations';
 import { UserEntityOptions } from '../../entities/User';
 import { UserEntityService } from '../userEntity/userEntity.class';
-import { HyperVergeResponse, HvFieldsExtracted, HvApiResponse, HvClientResponse } from '@unumid/id-verification-types';
+import { HyperVergeResponse, HvFieldsExtracted, HvApiResponse, HvClientResponse, HvApiResponseResultDetails } from '@unumid/id-verification-types';
 import { makeNetworkRequest, RESTResponse } from '../../utils/networkRequestHelper';
 import { config } from '../../config';
 import logger from '../../logger';
@@ -40,7 +40,9 @@ export class HyperVergeService {
         }
       });
 
-      const results: HvFieldsExtracted = response.body.result.results[0].apiResponse.result.details[0].fieldsExtracted;
+      const resultDetails: HvApiResponseResultDetails = response.body.result.results[0].apiResponse.result.details[0];
+      const results: HvFieldsExtracted = resultDetails.fieldsExtracted;
+      const imageUrl = resultDetails.croppedImageUrl;
 
       const docCountryId = results.countryCode.value;
       const firstName = results.firstName.value;
@@ -81,7 +83,8 @@ export class HyperVergeService {
         hvAddress: address,
         hvGender: gender,
         hvDocCountry: docCountryId,
-        hvDocType: docType
+        hvDocType: docType,
+        hvDocImage: imageUrl
       };
 
       const userEntity = await this.userEntityService.create(userEntityOptions, params);
