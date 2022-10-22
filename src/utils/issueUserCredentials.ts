@@ -1,5 +1,6 @@
 import { UnumDto } from '@unumid/server-sdk';
 import { CredentialData, CredentialPb } from '@unumid/types';
+import { gte } from 'semver';
 import { IssuerEntity } from '../entities/Issuer';
 import logger from '../logger';
 import { UserDto } from '../services/user/user.class';
@@ -84,63 +85,65 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
     });
   }
 
-  if (user.hvLiveFace) {
-    credentialSubjects.push({
-      type: 'LivelinessCredential',
-      liveliness: user.hvLiveFace
-    });
-  }
+  if (gte(version, '4.0.0')) {
+    if (user.hvLiveFace) {
+      credentialSubjects.push({
+        type: 'LivelinessCredential',
+        liveliness: user.hvLiveFace
+      });
+    }
 
-  if (user.hvDocCountry) {
-    credentialSubjects.push({
-      type: 'CountryResidenceCredential',
-      country: user.hvDocCountry
-    });
-  }
+    if (user.hvDocCountry) {
+      credentialSubjects.push({
+        type: 'CountryResidenceCredential',
+        country: user.hvDocCountry
+      });
+    }
 
-  if (user.hvDocType) {
-    credentialSubjects.push({
-      type: 'GovernmentIdTypeCredential',
-      documentType: user.hvDocType
-    });
-  }
+    if (user.hvDocType) {
+      credentialSubjects.push({
+        type: 'GovernmentIdTypeCredential',
+        documentType: user.hvDocType
+      });
+    }
 
-  if (user.hvLiveFaceConfidence) {
-    credentialSubjects.push({
-      type: 'LivelinessConfidenceCredential',
-      confidence: user.hvLiveFaceConfidence
-    });
-  }
+    if (user.hvLiveFaceConfidence) {
+      credentialSubjects.push({
+        type: 'LivelinessConfidenceCredential',
+        confidence: user.hvLiveFaceConfidence
+      });
+    }
 
-  if (user.hvFaceMatch) {
-    credentialSubjects.push({
-      type: 'FacialMatchCredential',
-      match: user.hvFaceMatch
-    });
-  }
+    if (user.hvFaceMatch) {
+      credentialSubjects.push({
+        type: 'FacialMatchCredential',
+        match: user.hvFaceMatch
+      });
+    }
 
-  if (user.hvFaceMatchConfidence) {
-    credentialSubjects.push({
-      type: 'FacialMatchConfidenceCredential',
-      confidence: user.hvFaceMatchConfidence
-    });
-  }
+    if (user.hvFaceMatchConfidence) {
+      credentialSubjects.push({
+        type: 'FacialMatchConfidenceCredential',
+        confidence: user.hvFaceMatchConfidence
+      });
+    }
 
-  /**
-   * Image credentials
-   */
-  if (user.hvDocImage) {
-    credentialSubjects.push({
-      type: 'GovernmentIdDocumentImageCredential',
-      image: user.hvDocImage
-    });
-  }
+    /**
+     * Image credentials
+     */
+    if (user.hvDocImage) {
+      credentialSubjects.push({
+        type: 'GovernmentIdDocumentImageCredential',
+        image: user.hvDocImage
+      });
+    }
 
-  if (user.hvFaceImage) {
-    credentialSubjects.push({
-      type: 'FacialImageCredential',
-      image: user.hvFaceImage
-    });
+    if (user.hvFaceImage) {
+      credentialSubjects.push({
+        type: 'FacialImageCredential',
+        image: user.hvFaceImage
+      });
+    }
   }
 
   logger.debug(`Created ${credentialSubjects.length} credential subjects for hyperverge credentials for user ${user.did}`);
