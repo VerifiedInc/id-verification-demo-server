@@ -1,7 +1,7 @@
 import { Application, Params, Service } from '@feathersjs/feathers';
 
-import { CredentialData, CredentialPb, SubjectCredentialRequests, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
-import { UnumDto, VerifiedStatus, verifySubjectCredentialRequests, reEncryptCredentials, extractCredentialType } from '@unumid/server-sdk';
+import { CredentialData, Credential, SubjectCredentialRequests, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
+import { UnumDto, VerifiedStatus, verifySubjectCredentialRequests, reEncryptCredentials, extractCredentialType, handleSubjectCredentialRequests, HandleSubjectCredentialRequestsOptions } from '@unumid/server-sdk';
 import { CredentialRequest } from '@unumid/types/build/protos/credential';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
@@ -19,7 +19,7 @@ export type CredentialsIssuedResponse = {
 
 export interface UserCredentialRequests extends SubjectCredentialRequestsEnrichedDto {
   user: UserDto;
-  credentialsIssuedByDidAssociation: CredentialPb[]
+  credentialsIssuedByDidAssociation: Credential[]
 }
 
 /**
@@ -80,7 +80,7 @@ export class UserCredentialRequestsService {
     //  *
     //  * Note: this corresponds to option b) above even though we are persisting the data on the user entity.
     //  */
-    // const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await reEncryptCredentialsHelper(hvIssuer, userDid, credentialTypesRequested);
+    // const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await reEncryptCredentialsHelper(hvIssuer, userDid, credentialTypesRequested);
 
     /**
      * We need some logic to determine if we have the data related to the user to issue the requested credentials.
@@ -102,7 +102,7 @@ export class UserCredentialRequestsService {
       }
     });
 
-    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(proveIssuer, userDid, credentialSubjects, version);
+    const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await issueCredentialsHelper(proveIssuer, userDid, credentialSubjects, version);
 
     // update the default issuer's auth token if it has been reissued
     if (unumDtoCredentialsIssuedResponse.authToken !== proveIssuer.authToken) {
@@ -166,7 +166,20 @@ export class UserCredentialRequestsService {
      *
      * Note: this corresponds to option b) above even though we are persisting the data on the user entity.
      */
-    const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await reEncryptCredentialsHelper(hvIssuer, userDid, credentialTypesRequested);
+    // const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await reEncryptCredentialsHelper(hvIssuer, userDid, credentialTypesRequested);
+    const inputs: HandleSubjectCredentialRequestsOptions = {
+      authToken: hvIssuer.authToken,
+      issuerDid: hvIssuer.did,
+      subjectDid: userDid,
+      subjectCredentialRequests,
+      reEncryptCredentialsOptions: {
+        signingPrivateKey: hvIssuer.signingPrivateKey,
+        encryptionPrivateKey: hvIssuer.encryptionPrivateKey,
+        issuerEncryptionKeyId: hvIssuer.encryptionKeyId,
+        credentialTypes: credentialTypesRequested
+      }
+    };
+    const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await handleSubjectCredentialRequests(inputs);
 
     // /**
     //  * We need some logic to determine if we have the data related to the user to issue the requested credentials.
@@ -202,7 +215,7 @@ export class UserCredentialRequestsService {
     //   }
     // });
 
-    // const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, userDid, credentialSubjects);
+    // const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await issueCredentialsHelper(hvIssuer, userDid, credentialSubjects);
 
     // update the default issuer's auth token if it has been reissued
     if (unumDtoCredentialsIssuedResponse.authToken !== hvIssuer.authToken) {
@@ -217,7 +230,7 @@ export class UserCredentialRequestsService {
 
     return {
       // credentialTypesIssued: credentialSubjects.map((credentialSubject: CredentialData) => credentialSubject.type)
-      credentialTypesIssued: unumDtoCredentialsIssuedResponse.body.flatMap((credential: CredentialPb) => extractCredentialType(credential.type))
+      credentialTypesIssued: unumDtoCredentialsIssuedResponse.body.flatMap((credential: Credential) => extractCredentialType(credential.type))
     };
   }
 
