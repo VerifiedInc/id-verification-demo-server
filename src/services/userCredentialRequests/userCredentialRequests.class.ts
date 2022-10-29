@@ -10,6 +10,7 @@ import { buildAtomicCredentialData, buildAtomicCredentialSubject, buildDobCreden
 import { BadRequest } from '@feathersjs/errors';
 import _ from 'lodash';
 import { reEncryptCredentialsHelper } from '../../utils/reEncryptCredentialsHelper';
+import { formatBearerToken } from '../../utils/formatBearerToken';
 
 export type ValidCredentialTypes = PhoneCredentialSubject | SsnCredentialSubject | DobCredentialSubject;
 
@@ -168,7 +169,7 @@ export class UserCredentialRequestsService {
      */
     // const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await reEncryptCredentialsHelper(hvIssuer, userDid, credentialTypesRequested);
     const inputs: HandleSubjectCredentialRequestsOptions = {
-      authToken: hvIssuer.authToken,
+      authorization: formatBearerToken(hvIssuer.authToken),
       issuerDid: hvIssuer.did,
       subjectDid: userDid,
       subjectCredentialRequests,
