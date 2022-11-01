@@ -179,12 +179,15 @@ export class UserCredentialRequestsService {
       }
     };
     const unumDtoCredentialsReEncryptedResponse: UnumDto<Credential[]> = await handleSubjectCredentialRequests(inputs);
+    logger.info(`handleSubjectCredentialRequests response: ${JSON.stringify(unumDtoCredentialsReEncryptedResponse)}`);
 
     const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
+    logger.debug(`credentialTypesRequested: ${JSON.stringify(credentialTypesRequested)}`);
 
     // take the difference of the credentials that were able to be re-encrypted with those requested
     const credentialTypesToIssue: string[] = unumDtoCredentialsReEncryptedResponse.body.map((credential: Credential) => extractCredentialType(credential.type)[0]).filter((type: string) => credentialTypesRequested.includes(type));
     // const credentialTypesToIssue: string[] = credentialTypesRequested.filter((type: string) => !unumDtoCredentialsReEncryptedResponse.body.map((credential: Credential) => credential.type).includes(type));
+    logger.info(`credentialTypesToIssue that were not able to be handled by handleSubjectCredentialRequests: ${JSON.stringify(credentialTypesToIssue)}`);
 
     /**
      * We need some logic to determine if we have the data related to the user to issue the requested credentials.
