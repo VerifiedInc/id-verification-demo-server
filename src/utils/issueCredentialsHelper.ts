@@ -40,8 +40,7 @@ export interface GenderCredentialSchema extends CredentialData {
 export const issueCredentialsHelper = async (
   issuerEntity: IssuerEntity,
   userDid: string,
-  credentialDataList: CredentialData[],
-  version: string
+  credentialDataList: CredentialData[]
 ): Promise<UnumDto<Credential[]>> => {
   let unumDtoCredentialResponse: UnumDto<Credential[]>;
 

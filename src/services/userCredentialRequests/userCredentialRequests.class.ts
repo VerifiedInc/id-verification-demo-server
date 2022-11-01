@@ -103,7 +103,7 @@ export class UserCredentialRequestsService {
       }
     });
 
-    const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await issueCredentialsHelper(proveIssuer, userDid, credentialSubjects, version);
+    const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await issueCredentialsHelper(proveIssuer, userDid, credentialSubjects);
 
     // update the default issuer's auth token if it has been reissued
     if (unumDtoCredentialsIssuedResponse.authToken !== proveIssuer.authToken) {
@@ -145,7 +145,6 @@ export class UserCredentialRequestsService {
     }
 
     const userDid = user.did as string; // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
-    // const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
 
     /**
      * At this point we have verified the credential requests signature signed by the subject, aka user, and we
@@ -179,43 +178,47 @@ export class UserCredentialRequestsService {
         issuerEncryptionKeyId: hvIssuer.encryptionKeyId
       }
     };
-    const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await handleSubjectCredentialRequests(inputs);
+    const unumDtoCredentialsReEncryptedResponse: UnumDto<Credential[]> = await handleSubjectCredentialRequests(inputs);
 
-    // /**
-    //  * We need some logic to determine if we have the data related to the user to issue the requested credentials.
-    //  *
-    //  * Note: this corresponds to option a) above.
-    //  */
-    // const credentialSubjects: CredentialData[] = [];
-    // credentialTypesRequested.forEach((type: string) => {
-    //   if (type === 'DobCredential' && user.hvDob) {
-    //     credentialSubjects.push(buildDobCredentialSubject(user.hvDob));
-    //   } else if (type === 'GenderCredential' && user.hvGender) {
-    //     credentialSubjects.push({ type: 'GenderCredential', gender: user.hvGender });
-    //   } else if (type === 'FullNameCredential' && user.hvFullName) {
-    //     credentialSubjects.push({ type: 'FullNameCredential', fullName: user.hvFullName });
-    //   } else if (type === 'AddressCredential' && user.hvAddress) {
-    //     credentialSubjects.push({ type: 'AddressCredential', address: user.hvAddress });
-    //   } else if (type === 'GovernmentIdDocumentImageCredential' && user.hvDocImage) {
-    //     credentialSubjects.push({ type: 'GovernmentIdDocumentImageCredential', image: user.hvDocImage });
-    //   } else if (type === 'CountryResidenceCredential' && user.hvDocCountry) {
-    //     credentialSubjects.push({ type: 'CountryResidenceCredential', country: user.hvDocCountry });
-    //   } else if (type === 'GovernmentIdTypeCredential' && user.hvDocType) {
-    //     credentialSubjects.push({ type: 'GovernmentIdTypeCredential', documentType: user.hvDocType });
-    //   } else if (type === 'FacialImageCredential' && user.hvFaceImage) {
-    //     credentialSubjects.push({ type: 'FacialImageCredential', image: user.hvFaceImage });
-    //   } else if (type === 'LivelinessCredential' && user.hvLiveFace) {
-    //     credentialSubjects.push({ type: 'LivelinessCredential', liveliness: user.hvLiveFace });
-    //   } else if (type === 'LivelinessConfidenceCredential' && user.hvLiveFaceConfidence) {
-    //     credentialSubjects.push({ type: 'LivelinessConfidenceCredential', confidence: user.hvLiveFaceConfidence });
-    //   } else if (type === 'FacialMatchCredential' && user.hvFaceMatch) {
-    //     credentialSubjects.push({ type: 'FacialMatchCredential', match: user.hvFaceMatch });
-    //   } else if (type === 'FacialMatchConfidenceCredential' && user.hvFaceMatchConfidence) {
-    //     credentialSubjects.push({ type: 'FacialMatchConfidenceCredential', confidence: user.hvFaceMatchConfidence });
-    //   }
-    // });
+    const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
 
-    // const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await issueCredentialsHelper(hvIssuer, userDid, credentialSubjects);
+    // take the difference of the credentials that were able to be re-encrypted with those requested
+    const credentialTypesToIssue: string[] = unumDtoCredentialsReEncryptedResponse.body.map((credential: Credential) => extractCredentialType(credential.type)[0]).filter((type: string) => credentialTypesRequested.includes(type));
+    // const credentialTypesToIssue: string[] = credentialTypesRequested.filter((type: string) => !unumDtoCredentialsReEncryptedResponse.body.map((credential: Credential) => credential.type).includes(type));
+
+    /**
+     * We need some logic to determine if we have the data related to the user to issue the requested credentials.
+     */
+    const credentialSubjects: CredentialData[] = [];
+    credentialTypesToIssue.forEach((type: string) => {
+      if (type === 'DobCredential' && user.hvDob) {
+        credentialSubjects.push(buildDobCredentialSubject(user.hvDob));
+      } else if (type === 'GenderCredential' && user.hvGender) {
+        credentialSubjects.push({ type: 'GenderCredential', gender: user.hvGender });
+      } else if (type === 'FullNameCredential' && user.hvFullName) {
+        credentialSubjects.push({ type: 'FullNameCredential', fullName: user.hvFullName });
+      } else if (type === 'AddressCredential' && user.hvAddress) {
+        credentialSubjects.push({ type: 'AddressCredential', address: user.hvAddress });
+      } else if (type === 'GovernmentIdDocumentImageCredential' && user.hvDocImage) {
+        credentialSubjects.push({ type: 'GovernmentIdDocumentImageCredential', image: user.hvDocImage });
+      } else if (type === 'CountryResidenceCredential' && user.hvDocCountry) {
+        credentialSubjects.push({ type: 'CountryResidenceCredential', country: user.hvDocCountry });
+      } else if (type === 'GovernmentIdTypeCredential' && user.hvDocType) {
+        credentialSubjects.push({ type: 'GovernmentIdTypeCredential', documentType: user.hvDocType });
+      } else if (type === 'FacialImageCredential' && user.hvFaceImage) {
+        credentialSubjects.push({ type: 'FacialImageCredential', image: user.hvFaceImage });
+      } else if (type === 'LivelinessCredential' && user.hvLiveFace) {
+        credentialSubjects.push({ type: 'LivelinessCredential', liveliness: user.hvLiveFace });
+      } else if (type === 'LivelinessConfidenceCredential' && user.hvLiveFaceConfidence) {
+        credentialSubjects.push({ type: 'LivelinessConfidenceCredential', confidence: user.hvLiveFaceConfidence });
+      } else if (type === 'FacialMatchCredential' && user.hvFaceMatch) {
+        credentialSubjects.push({ type: 'FacialMatchCredential', match: user.hvFaceMatch });
+      } else if (type === 'FacialMatchConfidenceCredential' && user.hvFaceMatchConfidence) {
+        credentialSubjects.push({ type: 'FacialMatchConfidenceCredential', confidence: user.hvFaceMatchConfidence });
+      }
+    });
+
+    const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await issueCredentialsHelper(hvIssuer, userDid, credentialSubjects);
 
     // update the default issuer's auth token if it has been reissued
     if (unumDtoCredentialsIssuedResponse.authToken !== hvIssuer.authToken) {
@@ -228,9 +231,14 @@ export class UserCredentialRequestsService {
       }
     }
 
+    // the output can be anything but for completeness going to return all the credentials that are now available to the subject.
+    // aka all the credentials that were re-encrypted and all the credentials that were issued.
+    const resultReEncrypted: string[] = unumDtoCredentialsReEncryptedResponse.body.map((credential: Credential) => extractCredentialType(credential.type)[0]);
+    const resultIssued: string[] = unumDtoCredentialsIssuedResponse.body.map((credential: Credential) => extractCredentialType(credential.type)[0]);
+    const result: string[] = resultReEncrypted.concat(resultIssued);
+
     return {
-      // credentialTypesIssued: credentialSubjects.map((credentialSubject: CredentialData) => credentialSubject.type)
-      credentialTypesIssued: unumDtoCredentialsIssuedResponse.body.flatMap((credential: Credential) => extractCredentialType(credential.type))
+      credentialTypesIssued: result
     };
   }
 

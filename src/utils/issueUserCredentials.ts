@@ -43,7 +43,7 @@ export async function issueProveUserCredentials (user: UserDto, proveIssuer: Iss
     });
   }
 
-  const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(proveIssuer, user.did as string, credentialSubjects, version);
+  const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(proveIssuer, user.did as string, credentialSubjects);
 
   return unumDtoCredentialsIssuedResponse;
 }
@@ -148,7 +148,7 @@ export async function issueHvUserCredentials (user: UserDto, hvIssuer: IssuerEnt
 
   logger.debug(`Created ${credentialSubjects.length} credential subjects for hyperverge credentials for user ${user.did}`);
 
-  const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, user.did as string, credentialSubjects, version);
+  const unumDtoCredentialsIssuedResponse: UnumDto<CredentialPb[]> = await issueCredentialsHelper(hvIssuer, user.did as string, credentialSubjects);
 
   logger.info(`Successfully issued ${unumDtoCredentialsIssuedResponse.body.length} hyperverge credentials to user ${user.did}`);
 
