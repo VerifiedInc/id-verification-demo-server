@@ -145,7 +145,7 @@ export class UserCredentialRequestsService {
     }
 
     const userDid = user.did as string; // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
-    const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
+    // const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
 
     /**
      * At this point we have verified the credential requests signature signed by the subject, aka user, and we
@@ -176,8 +176,7 @@ export class UserCredentialRequestsService {
       reEncryptCredentialsOptions: {
         signingPrivateKey: hvIssuer.signingPrivateKey,
         encryptionPrivateKey: hvIssuer.encryptionPrivateKey,
-        issuerEncryptionKeyId: hvIssuer.encryptionKeyId,
-        credentialTypes: credentialTypesRequested
+        issuerEncryptionKeyId: hvIssuer.encryptionKeyId
       }
     };
     const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await handleSubjectCredentialRequests(inputs);
