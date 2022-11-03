@@ -1,15 +1,14 @@
-import { Application, Params, Service } from '@feathersjs/feathers';
+import { Application, Params } from '@feathersjs/feathers';
 
-import { CredentialData, Credential, SubjectCredentialRequests, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
-import { UnumDto, VerifiedStatus, verifySubjectCredentialRequests, reEncryptCredentials, extractCredentialType, handleSubjectCredentialRequests, HandleSubjectCredentialRequestsOptions } from '@unumid/server-sdk';
+import { CredentialData, Credential, SubjectCredentialRequestsEnrichedDto } from '@unumid/types';
+import { UnumDto, extractCredentialType, handleSubjectCredentialRequests, HandleSubjectCredentialRequestsOptions } from '@unumid/server-sdk';
 import { CredentialRequest } from '@unumid/types/build/protos/credential';
 import { IssuerEntity } from '../../entities/Issuer';
 import logger from '../../logger';
 import { UserDto } from '../user/user.class';
-import { buildAtomicCredentialData, buildAtomicCredentialSubject, buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, DobCredentialSubject, issueCredentialsHelper, PhoneCredentialSubject, SsnCredentialSubject } from '../../utils/issueCredentialsHelper';
+import { buildDobCredentialSubject, buildPhoneCredentialSubject, buildSsnCredentialSubject, DobCredentialSubject, issueCredentialsHelper, PhoneCredentialSubject, SsnCredentialSubject } from '../../utils/issueCredentialsHelper';
 import { BadRequest } from '@feathersjs/errors';
 import _ from 'lodash';
-import { reEncryptCredentialsHelper } from '../../utils/reEncryptCredentialsHelper';
 import { formatBearerToken } from '../../utils/formatBearerToken';
 
 export type ValidCredentialTypes = PhoneCredentialSubject | SsnCredentialSubject | DobCredentialSubject;
@@ -50,46 +49,40 @@ export class UserCredentialRequestsService {
       throw new Error(`Persisted Issuer DID ${proveIssuer.did} does not match request's issuer did ${issuerDid}`);
     }
 
-    // handle SDK backwards compatibility
-    const verification: UnumDto<VerifiedStatus> = await verifySubjectCredentialRequests(proveIssuer.authToken, proveIssuer.did, subjectDid, subjectCredentialRequests);
-
-    if (!verification.body.isVerified) {
-      logger.error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
-      throw new Error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
-    }
-
-    const userDid = user.did as string; // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
-    const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
-
     /**
-     * At this point we have verified the credential requests signature signed by the subject, aka user, and we
-     * have confirmed to have a user with the matching did in our data store. Now we need to handle issue credentials to the user.
-     * for this have have a couple options:
-     *
-     * a) if we are persisting the credential data along side the User entity in our database then we should double check if have those
-     * values which would correspond to the requested credentials then issue the credentials.
-     *
-     * b) if we are not persisting credential data in our database and we use the default issueCredentials call to issue the credentials originally then we can just use the SDK's reEncryptCredentials.
-     *
-     * Note: The option to use reEncryptCredentials is valid even if we are persisting credential data in our database. In fact, we are showcasing that in handleHvCredentials.
+     * Using the server SDK's handleSubjectCredentialRequests helper to handle the subjectCredentialRequest verification and for re-encryption of the credentials for target user.
+     * This made possible by using the default issuerCredentials call which makes a copy of the user credentials available to the issuer keys.
+     * The benefit of this default is the Issuer does *not* have to store the user's credentials in the their (this demo's) data store.
      */
+    const inputs: HandleSubjectCredentialRequestsOptions = {
+      authorization: formatBearerToken(proveIssuer.authToken),
+      issuerDid: proveIssuer.did,
+      subjectDid,
+      subjectCredentialRequests,
+      reEncryptCredentialsOptions: {
+        signingPrivateKey: proveIssuer.signingPrivateKey,
+        encryptionPrivateKey: proveIssuer.encryptionPrivateKey,
+        issuerEncryptionKeyId: proveIssuer.encryptionKeyId
+      }
+    };
+    const unumDtoCredentialsReEncryptedResponse: UnumDto<Credential[]> = await handleSubjectCredentialRequests(inputs);
+    logger.debug(`handleSubjectCredentialRequests response: ${JSON.stringify(unumDtoCredentialsReEncryptedResponse)}`);
 
-    // /**
-    //  * Using the server SDK's re-encryption helper to handle the re-encryption of the credentials for target user.
-    //  * This made possible by using the default issuerCredentials call which makes a copy of the user credentials available to the issuer keys.
-    //  * The benefit of this default is the Issuer do *not* have to store the user's credentials in the their (this demo's) data store.
-    //  *
-    //  * Note: this corresponds to option b) above even though we are persisting the data on the user entity.
-    //  */
-    // const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await reEncryptCredentialsHelper(hvIssuer, userDid, credentialTypesRequested);
+    // get the credential types from the re-encrypted credentials
+    const credentialTypesReEncrypted: string[] = unumDtoCredentialsReEncryptedResponse.body.flatMap((credential: Credential) => extractCredentialType(credential.type)[0]);
+
+    const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
+    logger.debug(`credentialTypesRequested: ${JSON.stringify(credentialTypesRequested)}`);
+
+    // take the difference of the credentials that were able to be re-encrypted with those requested.
+    const credentialTypesToIssue: string[] = credentialTypesRequested.filter((type: string) => !credentialTypesReEncrypted.includes(type));
+    logger.info(`credentialTypesToIssue that were not able to be handled by handleSubjectCredentialRequests: ${JSON.stringify(credentialTypesToIssue)}`);
 
     /**
-     * We need some logic to determine if we have the data related to the user to issue the requested credentials.
-     *
-     * Note: this check then calling issueCredentials corresponds to option a) above
+     * We need some logic to determine if we have the data related to the user to issue the requested credentials that were not able to be handled via re-encryption.
      */
     const credentialSubjects: CredentialData[] = [];
-    credentialTypesRequested.forEach((type: string) => {
+    credentialTypesToIssue.forEach((type: string) => {
       if (type === 'DobCredential' && user.proveDob) {
         credentialSubjects.push(buildDobCredentialSubject(user.proveDob));
       } else if (type === 'SsnCredential' && user.proveSsn) {
@@ -103,7 +96,7 @@ export class UserCredentialRequestsService {
       }
     });
 
-    const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await issueCredentialsHelper(proveIssuer, userDid, credentialSubjects);
+    const unumDtoCredentialsIssuedResponse: UnumDto<Credential[]> = await issueCredentialsHelper(proveIssuer, subjectDid, credentialSubjects);
 
     // update the default issuer's auth token if it has been reissued
     if (unumDtoCredentialsIssuedResponse.authToken !== proveIssuer.authToken) {
@@ -156,6 +149,7 @@ export class UserCredentialRequestsService {
     const unumDtoCredentialsReEncryptedResponse: UnumDto<Credential[]> = await handleSubjectCredentialRequests(inputs);
     logger.debug(`handleSubjectCredentialRequests response: ${JSON.stringify(unumDtoCredentialsReEncryptedResponse)}`);
 
+    // get the credential types from the re-encrypted credentials
     const credentialTypesReEncrypted: string[] = unumDtoCredentialsReEncryptedResponse.body.flatMap((credential: Credential) => extractCredentialType(credential.type)[0]);
 
     const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
