@@ -144,7 +144,7 @@ export class UserCredentialRequestsService {
       throw new Error(`SubjectCredentialRequests could not be validated. Not issuing credentials. ${verification.body.message}`);
     }
 
-    const userDid = user.did as string; // Note in the userDidAssociation hook we have already ensured that the user has an associated did.
+    const userDid = subjectDid;
 
     /**
      * At this point we have verified the credential requests signature signed by the subject, aka user, and we
@@ -179,14 +179,15 @@ export class UserCredentialRequestsService {
       }
     };
     const unumDtoCredentialsReEncryptedResponse: UnumDto<Credential[]> = await handleSubjectCredentialRequests(inputs);
-    logger.info(`handleSubjectCredentialRequests response: ${JSON.stringify(unumDtoCredentialsReEncryptedResponse)}`);
+    logger.debug(`handleSubjectCredentialRequests response: ${JSON.stringify(unumDtoCredentialsReEncryptedResponse)}`);
+
+    const credentialTypesReEncrypted: string[] = unumDtoCredentialsReEncryptedResponse.body.flatMap((credential: Credential) => extractCredentialType(credential.type)[0]);
 
     const credentialTypesRequested: string[] = subjectCredentialRequests.credentialRequests.map((req: CredentialRequest) => req.type);
     logger.debug(`credentialTypesRequested: ${JSON.stringify(credentialTypesRequested)}`);
 
     // take the difference of the credentials that were able to be re-encrypted with those requested
-    const credentialTypesToIssue: string[] = unumDtoCredentialsReEncryptedResponse.body.map((credential: Credential) => extractCredentialType(credential.type)[0]).filter((type: string) => credentialTypesRequested.includes(type));
-    // const credentialTypesToIssue: string[] = credentialTypesRequested.filter((type: string) => !unumDtoCredentialsReEncryptedResponse.body.map((credential: Credential) => credential.type).includes(type));
+    const credentialTypesToIssue: string[] = credentialTypesRequested.filter((type: string) => !credentialTypesReEncrypted.includes(type));
     logger.info(`credentialTypesToIssue that were not able to be handled by handleSubjectCredentialRequests: ${JSON.stringify(credentialTypesToIssue)}`);
 
     /**

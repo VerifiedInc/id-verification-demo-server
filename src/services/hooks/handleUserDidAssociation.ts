@@ -34,7 +34,15 @@ export const handleUserDidAssociation: Hook = async (ctx) => {
     logger.debug('No new userDidAssociation in the userCredentialRequests');
 
     // ensuring credentialRequestsInfo must be present it userDidAssociation is not in the validation before hook validateUserCredentialRequest
-    const subjectDid = credentialRequestsInfo?.subjectDid;
+    const _subjectDid = credentialRequestsInfo?.subjectDid;
+
+    if (!_subjectDid) {
+      logger.error('UserCredentialRequests request made without subjectDid. This should never happen.');
+      throw new BadRequest('Invalid credentialRequestsInfo body: subjectDid must be defined.');
+    }
+
+    // ensure dealing with subject DID with no key id, aka fragment
+    const subjectDid = _subjectDid.split('#')[0];
 
     // grabbing user by subjectDid
     try {
