@@ -51,7 +51,7 @@
     "@feathersjs/express": "^4.5.11",
     "@feathersjs/feathers": "^4.5.11",
     "@feathersjs/rest-client": "^4.5.12",
-    "@feathersjs/socketio": "^4.5.11",
+    "@feathersjs/socketio": "^4.5.18",
     "@feathersjs/transport-commons": "^4.5.11",
     "@mikro-orm/cli": "^4.5.9",
     "@mikro-orm/core": "^4.5.9",
